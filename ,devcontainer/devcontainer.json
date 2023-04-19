@@ -1,0 +1,4 @@
+  {
+      "name": "ewd-labs-2023",
+      "image":"mcr.microsoft.com/devcontainers/javascript-node:0-18"
+  }
