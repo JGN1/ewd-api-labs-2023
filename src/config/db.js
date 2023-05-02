@@ -8,8 +8,7 @@ export default {
     async init() {
         if (process.env.DATABASE_DIALECT === "mongo") {
             // Connect to database
-            mongoose.connect('mongodb://127.0.0.1:27017/myapp');
-            // mongoose.connect(process.env.DATABASE_URL);
+            mongoose.connect(process.env.DATABASE_URL);
             const connection = await mongoose.connection;
 
             connection.on('error', (err) => {

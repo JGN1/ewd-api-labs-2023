@@ -13,8 +13,6 @@ const dependencies = buildDependencies();
 const app = express();
 const port = process.env.PORT;
 
-// db.init();
-
 app.use(express.json());
 app.use('/api/genres', genresRouter);
 app.use('/api/accounts', createAccountsRouter(dependencies));
