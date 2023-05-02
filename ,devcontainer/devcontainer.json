@@ -1,4 +1,17 @@
-  {
-      "name": "ewd-labs-2023",
-      "image":"mcr.microsoft.com/devcontainers/javascript-node:0-18"
+{
+  "name": "ewd-api-labs-2023",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "app",
+  "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+
+  // Configure tool-specific properties.
+  "customizations": {
+      // Configure properties specific to VS Code.
+      "vscode": {
+          // Add the IDs of extensions you want installed when the container is created.
+          "extensions": [
+              "mongodb.mongodb-vscode"
+          ]
+      }
   }
+}
