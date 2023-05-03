@@ -44,8 +44,13 @@ export default (dependencies) => {
         try {
             const { movieId } = request.body;
             const id = request.params.id;
-            const account = await accountService.addFavourite(id, movieId, dependencies);
-            response.status(200).json(account);
+            const favourites = await accountService.getFavourites(id, dependencies);
+            if (favourites.includes(movieId)==false) {
+                const account = await accountService.addFavourite(id, movieId, dependencies);
+                response.status(200).json(account);
+            } else {
+                throw new Error('Movie already in Favourites list');
+            }
         } catch (err) {
             next(new Error(`Invalid Data ${err.message}`));
         }
