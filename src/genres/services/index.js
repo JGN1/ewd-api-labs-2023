@@ -1,16 +1,11 @@
 import Genre from '../entities/Genre';
 
-console.log("in Genre services");
 export default {  
   addGenre: async (id, name, { genresRepository }) => {
     const genre = new Genre(id, name);
-    
-  console.log("in addGenre services");
     return genresRepository.persist(genre);
   },
   getGenre: (genreId, { genresRepository }) => {
-
-    console.log("in getGenre services");
     return genresRepository.get(genreId);
   },
   find: ({ genresRepository }) => {

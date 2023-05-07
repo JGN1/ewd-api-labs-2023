@@ -15,10 +15,10 @@ const createMoviesRouter = (dependencies) => {
         .get(accountsController.verify, moviesController.getMovie);
 
     router.route('/')
-        .get(moviesController.find);
+        .get(accountsController.verify, moviesController.find);
 
     router.route('/upcoming')
-        .get(moviesController.getUpcomingMovies);
+        .get(accountsController.verify, moviesController.getUpcomingMovies);
 
 
     return router;
