@@ -1,12 +1,14 @@
 import AccountsRepositoryInMemory from '../accounts/repositories/InMemoryRepository';
-// import AccountsRepositoryInMemory from '../accounts/repositories/in-memory/AccountRepository';
-// import AccountsRepositoryMongo from '../accounts/repositories/mongo/AccountRepository';
 import AccountsRepositoryMongo from '../accounts/repositories/MongoAccountRepository';
 import GenreRepositoryMongo from '../genres/repositories/MongoGenreRepository';
 import AccountSchema from '../accounts/validators';
 import GenreSchema from '../genres/validators';
+import Authenticator from '../accounts/security/BCryptAuthenticator';
+import TokenManager from './../accounts/security/JWTToken';
+// import AccountsRepositoryInMemory from '../accounts/repositories/in-memory/AccountRepository';
+// import AccountsRepositoryMongo from '../accounts/repositories/mongo/AccountRepository';
 // import Authenticator from './accounts/security';
-import Authenticator from '../accounts/security/simple';
+// import Authenticator from '../accounts/security/simple';
 
 const buildDependencies = () => {
   const dependencies = {
@@ -23,6 +25,7 @@ const buildDependencies = () => {
     dependencies.genresRepository = new GenreRepositoryMongo();
     dependencies.accountSchema = AccountSchema;
     dependencies.genreSchema = GenreSchema;
+    dependencies.tokenManager = new TokenManager();
   } else if (process.env.DATABASE_DIALECT === "mysql") {
     throw new Error('Add MySQL support');
   } else {

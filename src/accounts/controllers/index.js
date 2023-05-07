@@ -40,12 +40,26 @@ export default (dependencies) => {
             response.status(401).json({ message: 'Unauthorised' });
         }
     };
+    const verify = async (request, response, next) => {
+        try {
+            // Input
+            const authHeader = request.headers.authorization;
+            // Treatment
+            const accessToken = authHeader.split(" ")[1];
+            const user = await accountService.verifyToken(accessToken, dependencies);
+            //output
+            next();
+        } catch (err) {
+            //Token Verification Failed
+            next(new Error(`Verification Failed ${err.message}`));
+        }
+    };
     const addFavourite = async (request, response, next) => {
         try {
             const { movieId } = request.body;
             const id = request.params.id;
             const favourites = await accountService.getFavourites(id, dependencies);
-            if (favourites.includes(movieId)==false) {
+            if (favourites.includes(movieId) == false) {
                 const account = await accountService.addFavourite(id, movieId, dependencies);
                 response.status(200).json(account);
             } else {
@@ -71,6 +85,7 @@ export default (dependencies) => {
         listAccounts,
         updateAccount,
         authenticateAccount,
+        verify,
         addFavourite,
         getFavourites
     };
