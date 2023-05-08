@@ -5,6 +5,7 @@ import genresRouter from './src/genres/routes';
 import createAccountsRouter from './src/accounts/routes';
 import buildDependencies from "./src/config/dependencies";
 import createMoviesRouter from './src/movies/routes';
+import createReviewsRouter from './src/reviews/routes';
 import db from './src/config/db';
 import errorHandler from './src/utils/ErrorHandler';
 
@@ -19,6 +20,7 @@ app.use(express.json());
 app.use('/api/genres', genresRouter(dependencies));
 app.use('/api/accounts', createAccountsRouter(dependencies));
 app.use('/api/movies', createMoviesRouter(dependencies));
+app.use('/api/reviews', createReviewsRouter(dependencies));
 app.use(errorHandler);
 
 app.listen(port, () => {

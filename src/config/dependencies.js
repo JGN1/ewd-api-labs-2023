@@ -1,7 +1,9 @@
 import AccountsRepositoryInMemory from '../accounts/repositories/InMemoryRepository';
 import AccountsRepositoryMongo from '../accounts/repositories/MongoAccountRepository';
+import ReviewsRepositoryMongo from '../reviews/repositories/MongoReviewRepository';
 import GenreRepositoryMongo from '../genres/repositories/MongoGenreRepository';
 import AccountSchema from '../accounts/validators';
+import ReviewSchema from '../reviews/validators';
 import GenreSchema from '../genres/validators';
 import Authenticator from '../accounts/security/BCryptAuthenticator';
 import TokenManager from './../accounts/security/JWTToken';
@@ -22,8 +24,10 @@ const buildDependencies = () => {
     dependencies.accountSchema = AccountSchema;
   } else if (process.env.DATABASE_DIALECT === "mongo") {
     dependencies.accountsRepository = new AccountsRepositoryMongo();
+    dependencies.reviewsRepository = new ReviewsRepositoryMongo();
     dependencies.genresRepository = new GenreRepositoryMongo();
     dependencies.accountSchema = AccountSchema;
+    dependencies.reviewSchema = ReviewSchema;
     dependencies.genreSchema = GenreSchema;
     dependencies.tokenManager = new TokenManager();
   } else if (process.env.DATABASE_DIALECT === "mysql") {
