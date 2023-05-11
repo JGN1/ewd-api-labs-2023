@@ -1,0 +1,276 @@
+openapi: 3.0.0
+servers:
+  # Added by API Auto Mocking Plugin
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/JGN1/MSC_DevWeb_API/1.0.0
+info:
+  description: This is a simple API
+  version: "1.0.0"
+  title: Simple Inventory API
+  contact:
+    email: you@your-company.com
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+tags:
+  - name: admins
+    description: Secured Admin-only calls
+  - name: developers
+    description: Operations available to regular developers
+  - name: Reviews
+    description: Endpoint for user Movie Reviews
+  - name: Actors
+    description: Endpoint for Actor Information
+  - name: User Reviews on Actors
+    description: Endpoint for Actor Information
+    
+paths:
+  /inventory:
+    get:
+      tags:
+        - developers
+      summary: searches inventory
+      operationId: searchInventory
+      description: |
+        By passing in the appropriate options, you can search for
+        available inventory in the system
+      parameters:
+        - in: query
+          name: searchString
+          description: pass an optional search string for looking up inventory
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: skip
+          description: number of records to skip for pagination
+          schema:
+            type: integer
+            format: int32
+            minimum: 0
+        - in: query
+          name: limit
+          description: maximum number of records to return
+          schema:
+            type: integer
+            format: int32
+            minimum: 0
+            maximum: 50
+      responses:
+        '200':
+          description: search results matching criteria
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/InventoryItem'
+        '400':
+          description: bad input parameter
+    post:
+      tags:
+        - admins
+      summary: adds an inventory item
+      operationId: addInventory
+      description: Adds an item to the system
+      responses:
+        '201':
+          description: item created
+        '400':
+          description: 'invalid input, object invalid'
+        '409':
+          description: an existing item already exists
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InventoryItem'
+        description: Inventory item to add
+
+
+
+  /api/reviews:
+    get:
+      tags:
+        - Reviews
+      summary: Returns all reviews stored
+      operationId: getAllReviews
+      description: |
+        Default get operation on this path brings back all Movie Reviews stored in repository.
+      responses:
+        '200':
+          description: search results matching criteria
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MovieReview'
+        '400':
+          description: bad input parameter
+    post:
+      tags:
+        - Reviews
+      summary: Adds a user movie review
+      operationId: addReview
+      description: Adds a users movie review to database storage
+      parameters:
+        - in: query
+          name: reviewId
+          description: pass MongoDB review id 
+          required: true
+          schema:
+            type: string
+      responses:
+        '201':
+          description: item created
+        '500':
+          description: 'invalid input, object invalid'
+        '409':
+          description: an existing item already exists
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MovieReview'
+        description: Movie review data and metadata
+  
+  /api/reviews/id:
+    get:
+      tags:
+        - Reviews
+      summary: Returns specific review
+      operationId: getReview
+      description: |
+        This endpoint brings back the movie review for the supplied mongodb id.
+      parameters:
+        - in: query
+          name: reviewId
+          description: pass MongoDB review id 
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: search results matching criteria
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MovieReview'
+        '400':
+          description: bad input parameter
+    put:
+      tags:
+        - Reviews
+      summary: Update a user movie review
+      operationId: updateReview
+      description: Update an existing user movie review
+      parameters:
+        - in: query
+          name: reviewId
+          description: pass MongoDB review id 
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: item created
+        '500':
+          description: 'invalid input, object invalid'
+        '409':
+          description: an existing item already exists
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MovieReview'
+        description: Movie review data and metadata
+        
+  /api/reviews/id/delete:
+    delete:
+      tags:
+        - Reviews
+      summary: Delete a user movie review
+      operationId: removeReview
+      description: Delete an existing user movie review
+      parameters:
+        - in: query
+          name: reviewId
+          description: pass MongoDB review id 
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: item deleted
+        '500':
+          description: 'invalid input, object invalid'
+        '409':
+          description: an existing item already exists
+
+
+
+components:
+  schemas:
+    InventoryItem:
+      type: object
+      required:
+        - id
+        - name
+        - manufacturer
+        - releaseDate
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: d290f1ee-6c54-4b01-90e6-d701748f0851
+        name:
+          type: string
+          example: Widget Adapter
+        releaseDate:
+          type: string
+          format: date-time
+          example: '2016-08-29T09:12:33.001Z'
+        manufacturer:
+          $ref: '#/components/schemas/Manufacturer'
+    Manufacturer:
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          example: ACME Corporation
+        homePage:
+          type: string
+          format: url
+          example: 'https://www.acme-corp.com'
+        phone:
+          type: string
+          example: 408-867-5309
+      type: object
+    MovieReview:
+      type: object
+      required:
+        - movieId
+        - movie
+        - author
+        - review
+        - rating
+      properties:
+        movieId:
+          type: int
+          example: 266153
+        movie:
+          type: string
+          example: Bourne Identity
+        author:
+          type: string
+          example: John Smith
+        review:
+          type: string
+          example: The movie is fast paced from the outset with well orchestrated car chases.
+        rating:
+          type: int
+          example: 3

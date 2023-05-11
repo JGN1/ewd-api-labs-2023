@@ -31,13 +31,13 @@ export default {
   },
 
   // Adding following for actor reviews
-  addReview: async (actorId, firstName, lastName, review, rating, { actorReviewsRepository }) => {
-    const newReview = new ActorReview(undefined, actorId, firstName, lastName, review, rating);
+  addReview: async (actorId, firstName, lastName, review, rating, author, { actorReviewsRepository }) => {
+    const newReview = new ActorReview(undefined, actorId, firstName, lastName, review, rating, author);
     return actorReviewsRepository.persist(newReview);
   },
-  updateReview: async (id, actorId, firstName, lastName, review, rating, { actorReviewsRepository }) => {
+  updateReview: async (id, actorId, firstName, lastName, review, rating, author, { actorReviewsRepository }) => {
     //TODO - you implement the rest
-    const reviewUpdate = new ActorReview(id, actorId, firstName, lastName, review, rating);
+    const reviewUpdate = new ActorReview(id, actorId, firstName, lastName, review, rating, author);
     return actorReviewsRepository.merge(reviewUpdate);
   },
   removeReview: (id, { actorReviewsRepository }) => {
@@ -48,5 +48,10 @@ export default {
   },
   find: ({ query, actorReviewsRepository }) => {
     return actorReviewsRepository.find(query);
+    // return actorReviewsRepository.find(query);
+  },
+  getAll: ({ query, actorReviewsRepository }) => {
+    return actorReviewsRepository.getAll(query);
+    // return actorReviewsRepository.find(query);
   }
 };

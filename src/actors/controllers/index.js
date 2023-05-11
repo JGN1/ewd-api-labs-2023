@@ -36,17 +36,17 @@ export default (dependencies) => {
     // Following for Actor Review in MongoDB
     const addReview = async (request, response, next) => {
         // Input
-        const { actorId, firstName, lastName, review, rating } = request.body;
+        const { actorId, firstName, lastName, review, rating, author } = request.body;
         // Treatment
-        const newReview = await actorService.addReview(actorId, firstName, lastName, review, rating, dependencies);
+        const newReview = await actorService.addReview(actorId, firstName, lastName, review, rating, author, dependencies);
         //output
         response.status(201).json(newReview);
     };
     const updateReview = async (request, response, next) => {
         // Input
         const id = request.params.id;
-        const { actorId, firstName, lastName, review, rating } = request.body;
-        const updatedReview = await actorService.updateReview(id, actorId, firstName, lastName, review, rating, dependencies);
+        const { actorId, firstName, lastName, review, rating, author } = request.body;
+        const updatedReview = await actorService.updateReview(id, actorId, firstName, lastName, review, rating, author, dependencies);
         response.status(200).json(updatedReview);
     };
     const removeReview = async (request, response, next) => {
@@ -70,7 +70,8 @@ export default (dependencies) => {
         //input
         const query = request.query;
         // Treatment
-        const reviews = await actorService.find(query, dependencies);
+        const reviews = await actorService.getAll(query, dependencies);
+        // const reviews = await actorService.find(query, dependencies);
         //output
         response.status(200).json(reviews);
     };
