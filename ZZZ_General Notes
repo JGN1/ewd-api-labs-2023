@@ -2,3 +2,4 @@ Review Integration with REACT app
 In order to minimse code changes I added new review.js in API folder of React app with apiAddReview method, updated moviesContext.jsx
 
 IDEA - mustwatch could be another endpoint - IDEA
+IDEA - use this in movieReviews to add mongdb reviews to end of those from TMDB API call. - setMyReviews( {...myReviews, [movie.id]: review } )
