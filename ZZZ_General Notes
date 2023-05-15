@@ -1,0 +1,4 @@
+Review Integration with REACT app
+In order to minimse code changes I added new review.js in API folder of React app with apiAddReview method, updated moviesContext.jsx
+
+IDEA - mustwatch could be another endpoint - IDEA

@@ -18,7 +18,11 @@ const createRouter = (dependencies) => {
         .get(reviewsController.getAllReviews);
 
     router.route('/:id')
-        .get(reviewsController.getReview);
+        // .get(reviewsController.getReviewByMovieId);
+    .get(reviewsController.getReview);
+
+    router.route('/:id/movie')
+        .get(reviewsController.getReviewByMovieId);
 
     router.route('/:id')
         .put(reviewsController.updateReview);

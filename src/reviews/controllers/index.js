@@ -27,13 +27,25 @@ export default (dependencies) => {
     };
     const getReview = async (request, response, next) => {
         //input
-        const movieId = request.params.id;
-        console.log("the movie id is "+movieId);
+        const reviewId = request.params.id;
+        console.log("the movie id is "+reviewId);
         // Treatment
-        const review = await reviewService.getReview(movieId, dependencies);
+        const review = await reviewService.getReview(reviewId, dependencies);
         //output
         response.status(200).json(review);
     };
+    
+    const getReviewByMovieId = async (request, response, next) => {
+        console.log("In controllers.js - getReviewByMovieId method");
+        //input
+        const movieId = request.params.id;
+        console.log("the movie id is "+movieId);
+        // Treatment
+        const review = await reviewService.getReviewByMovieId(movieId, dependencies);
+        //output
+        response.status(200).json(review);
+    };
+
     const getAllReviews = async (request, response, next) => {
         // Treatment
         const reviews = await reviewService.find(dependencies);
@@ -46,6 +58,7 @@ export default (dependencies) => {
         updateReview,
         removeReview,
         getReview,
-        getAllReviews
+        getAllReviews,
+        getReviewByMovieId
     };
 };

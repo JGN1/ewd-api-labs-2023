@@ -13,9 +13,13 @@ export default {
   removeReview: (id, { reviewsRepository }) => {
     return reviewsRepository.remove(id);
   },
-  getReview: (movieId, { reviewsRepository }) => {
-    return reviewsRepository.get(movieId);
+  getReview: (reviewId, { reviewsRepository }) => {
+    return reviewsRepository.get(reviewId);
   },
+  getReviewByMovieId: (movieId, { reviewsRepository }) => {
+    console.log("In Services.js - getReviewByMovieId method");
+    return reviewsRepository.getMovie(movieId);
+  },  
   find: ({ reviewsRepository }) => {
     return reviewsRepository.find();
   }
