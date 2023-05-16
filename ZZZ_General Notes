@@ -3,3 +3,9 @@ In order to minimse code changes I added new review.js in API folder of React ap
 
 IDEA - mustwatch could be another endpoint - IDEA
 IDEA - use this in movieReviews to add mongdb reviews to end of those from TMDB API call. - setMyReviews( {...myReviews, [movie.id]: review } )
+
+
+Hooked up React app to Review endpoint for POST. Can now add review from REACT app to MongoDB
+via my API. Built out additional GET endpoint to search by movieID and bring back array of reviews for movie from MongDB
+
+"Refactored my review API to use 'content' instead of 'review' for review content field This was to make compatible with React app. Also adjusted React movieReviews in React App to reach out to my API for reviews to display in app"

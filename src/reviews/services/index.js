@@ -1,26 +1,50 @@
 import Review from '../entities/Review';
+import logger from "../../logger";
 
 export default {
   addReview: async (movieId, movie, author, content, rating, { reviewsRepository }) => {
-    const newReview = new Review(undefined, movieId, movie, author, content, rating);
-    return reviewsRepository.persist(newReview);
+    try {
+      const newReview = new Review(undefined, movieId, movie, author, content, rating);
+      return reviewsRepository.persist(newReview);
+    } catch (error) {
+      logger.error(new Error(error));
+    }
   },
   updateReview: async (id, movieId, movie, author, content, rating, { reviewsRepository }) => {
-    //TODO - you implement the rest
-    const reviewUpdate = new Review(id, movieId, movie, author, content, rating);
-    return reviewsRepository.merge(reviewUpdate);
+    try {
+      //TODO - you implement the rest
+      const reviewUpdate = new Review(id, movieId, movie, author, content, rating);
+      return reviewsRepository.merge(reviewUpdate);
+    } catch (error) {
+      logger.error(new Error(error));
+    }
   },
   removeReview: (id, { reviewsRepository }) => {
-    return reviewsRepository.remove(id);
+    try {
+      return reviewsRepository.remove(id);
+    } catch (error) {
+      logger.error(new Error(error));
+    }
   },
   getReview: (reviewId, { reviewsRepository }) => {
-    return reviewsRepository.get(reviewId);
+    try {
+      return reviewsRepository.get(reviewId);
+    } catch (error) {
+      logger.error(new Error(error));
+    }
   },
   getReviewByMovieId: (movieId, { reviewsRepository }) => {
-    console.log("In Services.js - getReviewByMovieId method");
-    return reviewsRepository.getMovie(movieId);
-  },  
+    try {
+      return reviewsRepository.getMovie(movieId);
+    } catch (error) {
+      logger.error(new Error(error));
+    }
+  },
   find: ({ reviewsRepository }) => {
-    return reviewsRepository.find();
+    try {
+      return reviewsRepository.find();
+    } catch (error) {
+      logger.error(new Error(error));
+    }
   }
 };

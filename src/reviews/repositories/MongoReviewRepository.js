@@ -1,6 +1,7 @@
 import Review from '../entities/Review';
 import mongoose from 'mongoose';
 import ReviewRepository from './Repository';
+import logger from "../../logger";
 
 export default class extends ReviewRepository {
 
@@ -18,52 +19,68 @@ export default class extends ReviewRepository {
     }
 
     async persist(reviewEntity) {
-        const { movieId, movie, author, content, rating } = reviewEntity;
-        const result = new this.model({ movieId, movie, author, content, rating });
-        await result.save();
-        reviewEntity.id = result.id;
-        return reviewEntity;
+        try {
+            const { movieId, movie, author, content, rating } = reviewEntity;
+            const result = new this.model({ movieId, movie, author, content, rating });
+            await result.save();
+            reviewEntity.id = result.id;
+            return reviewEntity;
+        } catch (error) {
+            logger.error(new Error(error));
+        }
     }
 
     async merge(reviewEntity) {
-        const { id, movieId, movie, author, content, rating } = reviewEntity;
-        await this.model.findByIdAndUpdate(id, { movieId, movie, author, content, rating });
-        console.log({ id, movieId, movie, author, content, rating });
-        return reviewEntity;
+        try {
+            const { id, movieId, movie, author, content, rating } = reviewEntity;
+            await this.model.findByIdAndUpdate(id, { movieId, movie, author, content, rating });
+            console.log({ id, movieId, movie, author, content, rating });
+            return reviewEntity;
+        } catch (error) {
+            logger.error(new Error(error));
+        }
     }
 
     async remove(id) {
-        return this.model.findOneAndDelete(id);
+        try {
+            return this.model.findOneAndDelete(id);
+        } catch (error) {
+            logger.error(new Error(error));
+        }
     }
 
     async get(reviewId) {
-        const result = await this.model.findById(reviewId);
-        console.log(JSON.stringify("this is the result of search " + result));
-        const { id, movieId, movie, author, content, rating } = result;
-        return new Review(id, movieId, movie, author, content, rating);
+        try {
+            const result = await this.model.findById(reviewId);
+            console.log(JSON.stringify("this is the result of search " + result));
+            const { id, movieId, movie, author, content, rating } = result;
+            return new Review(id, movieId, movie, author, content, rating);
+        } catch (error) {
+            logger.error(new Error(error));
+        }
     }
 
     async getMovie(searchMovieId) {
-        console.log("In MongoRepository getMovie method");
+        // console.log("In MongoRepository getMovie method");
         try {
             const reviews = await this.model.find({ movieId: searchMovieId });
-
-
             return reviews.map((result) => {
-                // return new Review(result.id, result.movieId, result.movie, result.author, result.review, result.rating);
                 const { id, movieId, movie, author, content, rating } = result;
                 return new Review(id, movieId, movie, author, content, rating);
             });
         } catch (error) {
-            console.log(error);
-
+            logger.error(new Error(error));
         }
     }
 
     async find() {
-        const reviews = await this.model.find();
-        return reviews.map((result) => {
-            return new Review(result.id, result.movieId, result.movie, result.author, result.content, result.rating);
-        });
+        try {
+            const reviews = await this.model.find();
+            return reviews.map((result) => {
+                return new Review(result.id, result.movieId, result.movie, result.author, result.content, result.rating);
+            });
+        } catch (error) {
+            logger.error(new Error(error));
+        }
     }
 }

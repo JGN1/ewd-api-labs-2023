@@ -1,6 +1,7 @@
 import Review from '../entities/ActorReview';
 import mongoose from 'mongoose';
 import ReviewRepository from './Repository';
+import logger from "../../logger";
 
 export default class extends ReviewRepository {
 
@@ -19,43 +20,66 @@ export default class extends ReviewRepository {
     }
 
     async persist(reviewEntity) {
-        const {actorId, firstName, lastName, review, rating, author} = reviewEntity;
-        const result = new this.model({actorId, firstName, lastName, review, rating, author});
-        await result.save();
-        reviewEntity.id=result.id;
-        return reviewEntity;
+        try {
+            const { actorId, firstName, lastName, review, rating, author } = reviewEntity;
+            const result = new this.model({ actorId, firstName, lastName, review, rating, author });
+            await result.save();
+            reviewEntity.id = result.id;
+            return reviewEntity;
+        } catch (error) {
+            logger.error(new Error(error));
+        }
     }
 
     async merge(reviewEntity) {
-        const {id, actorId, firstName, lastName, review, rating, author } = reviewEntity;
-        await this.model.findByIdAndUpdate(id, { actorId, firstName, lastName, review, rating, author });
-        console.log({id, actorId, firstName, lastName, review, rating, author });
-        return reviewEntity;
+        try {
+            const { id, actorId, firstName, lastName, review, rating, author } = reviewEntity;
+            await this.model.findByIdAndUpdate(id, { actorId, firstName, lastName, review, rating, author });
+            console.log({ id, actorId, firstName, lastName, review, rating, author });
+            return reviewEntity;
+        } catch (error) {
+            logger.error(new Error(error));
+        }
     }
 
     async remove(id) {
-        return this.model.findOneAndDelete(id);
+        try {
+            return this.model.findOneAndDelete(id);
+        } catch (error) {
+            logger.error(new Error(error));
+        }
     }
 
     async get(reviewId) {
-        const result = await this.model.findById(reviewId);
-        console.log(JSON.stringify("this is the result of search " + result));
-        const {id, actorId, firstName, lastName, review, rating, author } = result;
-        return new Review(id, actorId, firstName, lastName, review, rating, author );
+        try {
+            const result = await this.model.findById(reviewId);
+            const { id, actorId, firstName, lastName, review, rating, author } = result;
+            return new Review(id, actorId, firstName, lastName, review, rating, author);
+        } catch (error) {
+            logger.error(new Error(error));
+        }
     }
 
     async find() {
-        const reviews = await this.model.find({});        
-        return reviews.map((result) => {
-            return new Review(result.id, result.actorId, result.firstName, result.lastName, result.review, result.rating, result.author);
-        });
+        try {
+            const reviews = await this.model.find({});
+            return reviews.map((result) => {
+                return new Review(result.id, result.actorId, result.firstName, result.lastName, result.review, result.rating, result.author);
+            });
+        } catch (error) {
+            logger.error(new Error(error));
+        }
     }
-    
+
     async getAll() {
-        const reviews = await this.model.find({});        
-        return reviews.map((result) => {
-            return new Review(result.id, result.actorId, result.firstName, result.lastName, result.review, result.rating, result.author);
-        });
+        try {
+            const reviews = await this.model.find({});
+            return reviews.map((result) => {
+                return new Review(result.id, result.actorId, result.firstName, result.lastName, result.review, result.rating, result.author);
+            });
+        } catch (error) {
+            logger.error(new Error(error));
+        }
     }
 
 }
