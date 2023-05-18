@@ -1,4 +1,5 @@
 import accountService from "../services";
+import logger from "../../logger";
 
 export default (dependencies) => {
 
@@ -35,8 +36,10 @@ export default (dependencies) => {
         try {
             const { email, password } = request.body;
             const token = await accountService.authenticate(email, password, dependencies);
+            logger.info(email + " successfully logged in");
             response.status(200).json({ token: `BEARER ${token}` });
         } catch (error) {
+            logger.error('HTTP/1.1 401 Unauthorized');
             response.status(401).json({ message: 'Unauthorised' });
         }
     };
@@ -47,10 +50,12 @@ export default (dependencies) => {
             // Treatment
             const accessToken = authHeader.split(" ")[1];
             const user = await accountService.verifyToken(accessToken, dependencies);
+            logger.info("Successfully verified access token");
             //output
             next();
         } catch (err) {
             //Token Verification Failed
+            logger.error(new Error(`Verification Failed ${err.message}`));
             next(new Error(`Verification Failed ${err.message}`));
         }
     };

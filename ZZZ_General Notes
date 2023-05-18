@@ -9,3 +9,5 @@ Hooked up React app to Review endpoint for POST. Can now add review from REACT a
 via my API. Built out additional GET endpoint to search by movieID and bring back array of reviews for movie from MongDB
 
 "Refactored my review API to use 'content' instead of 'review' for review content field This was to make compatible with React app. Also adjusted React movieReviews in React App to reach out to my API for reviews to display in app"
+
+Changes made to MOvie app to intergrate - Added stage and dev env for VITE. Can now run stage version to use my API for login and use dev version to use SUPABASE authentication. Added file rename function to copy appropriate authcontext file for each before startup of vite server (in package.json scripts). Added additional proxy path for accounts securtity token.

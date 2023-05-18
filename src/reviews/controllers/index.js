@@ -6,6 +6,7 @@ export default (dependencies) => {
 
     const addReview = async (request, response, next) => {
         try {
+            logger.error("adding test error");
             // Input
             const { movieId, movie, author, content, rating } = request.body;
             // Treatment
