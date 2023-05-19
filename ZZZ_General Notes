@@ -10,4 +10,14 @@ via my API. Built out additional GET endpoint to search by movieID and bring bac
 
 "Refactored my review API to use 'content' instead of 'review' for review content field This was to make compatible with React app. Also adjusted React movieReviews in React App to reach out to my API for reviews to display in app"
 
-Changes made to MOvie app to intergrate - Added stage and dev env for VITE. Can now run stage version to use my API for login and use dev version to use SUPABASE authentication. Added file rename function to copy appropriate authcontext file for each before startup of vite server (in package.json scripts). Added additional proxy path for accounts securtity token.
+Changes made to React Movie app to integrate - Added stage and dev env for VITE. Can now run stage version to use my API for login and use dev version to use SUPABASE authentication. Added file rename function to copy appropriate authcontext file for each before startup of vite server (in package.json scripts). Added additional proxy path for accounts securtity token.
+
+
+For Auth - using .env variable. 
+   	- In component/profileIcon/index.jsx to set displayname for profile icon on top right screen
+	- In Login.jsx page
+    - Added in components/movieReviews/index.js for switching between retrieval of TMDB and own API reviews use 'dev' and 'stage' environments
+
+if (import.meta.env.VITE_AUTH_API == "MONGODB") {...}
+if (import.meta.env.VITE_AUTH_API == "SUPABASE") {...}
+

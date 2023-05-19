@@ -6,13 +6,13 @@ export default (dependencies) => {
 
     const addReview = async (request, response, next) => {
         try {
-            logger.error("adding test error");
             // Input
             const { movieId, movie, author, content, rating } = request.body;
             // Treatment
             const newReview = await reviewService.addReview(movieId, movie, author, content, rating, dependencies);
             //output
             response.status(201).json(newReview);
+            logger.info("Review Added - "+JSON.stringify(newReview));
         } catch (error) {
             logger.error(new Error(error));
         }
@@ -50,6 +50,7 @@ export default (dependencies) => {
             //output
             response.status(200).json(review);
         } catch (error) {
+            response.status(400).json(error);
             logger.error(new Error(error));
         }
     };
@@ -62,7 +63,9 @@ export default (dependencies) => {
             const review = await reviewService.getReviewByMovieId(movieId, dependencies);
             //output
             response.status(200).json(review);
+            logger.info(JSON.stringify(review));
         } catch (error) {
+            response.status(400).json(error);
             logger.error(new Error(error));
         }
     };

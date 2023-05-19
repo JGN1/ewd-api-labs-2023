@@ -9,9 +9,9 @@ Name: [Your Name]
 
 [A bullet-point list of the ADDITIONAL features/endpoints you have implemented in the API **THAT WERE NOT IN THE LABS** ]. 
 
- + Feature 1 - .... a statement of its purpose/objective ..... 
+ + Feature 1 - Review Endpoint 
 
- + Feature 2 - .......
+ + Feature 2 - Actor Endpoint
 
  + Feature 3 - ......
 
@@ -65,6 +65,18 @@ secret=YourJWTSecret
 [If you have your API design on an online platform or graphic, please link to it (e.g. [Swaggerhub](https://app.swaggerhub.com/)).]
 https://app.swaggerhub.com/apis-docs/fxwalsh/userAPI/initial
 
+=========================EDIT=============================
+
+Here is my Swagger API Documentation
+https://app.swaggerhub.com/apis/JGN1/MSC_DevWeb_API/1.0.0#/
+The API is broken into 3 broad sections... 
++ Reviews - Endpoints for user Movie Reviews
++ Actors - Endpoints for Actor Information
++ User Reviews on Actors - Endpoint for Actor Review Information
+
+These contain 10 endpoints utilising 15 various GET. POST, PUT and DELETE method invocations.
+
+=========================EDIT=============================
 
 
 

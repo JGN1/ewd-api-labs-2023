@@ -2,132 +2,128 @@ openapi: 3.0.0
 servers:
   # Added by API Auto Mocking Plugin
   - description: SwaggerHub API Auto Mocking
-    url: https://virtserver.swaggerhub.com/JGN1/MSC_DevWeb_API/1.0.0
+    url: https://virtserver.swaggerhub.com/JGN1/MSC_DevWeb_API/1.0.0  
 info:
-  description: This is a simple API
+  description: This API was developed for Assignment 2 Submission for Enterprise Web Development module
   version: "1.0.0"
-  title: Simple Inventory API
+  title: MSC EWD API - Joe Nunan
   contact:
-    email: you@your-company.com
+    email: 20054843@mail.wit.ie
   license:
     name: Apache 2.0
     url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
 tags:
-  - name: admins
-    description: Secured Admin-only calls
-  - name: developers
-    description: Operations available to regular developers
   - name: Reviews
     description: Endpoint for user Movie Reviews
   - name: Actors
     description: Endpoint for Actor Information
   - name: User Reviews on Actors
-    description: Endpoint for Actor Information
+    description: Endpoint for Actor Review Information
     
 paths:
-  /inventory:
-    get:
-      tags:
-        - developers
-      summary: searches inventory
-      operationId: searchInventory
-      description: |
-        By passing in the appropriate options, you can search for
-        available inventory in the system
-      parameters:
-        - in: query
-          name: searchString
-          description: pass an optional search string for looking up inventory
-          required: false
-          schema:
-            type: string
-        - in: query
-          name: skip
-          description: number of records to skip for pagination
-          schema:
-            type: integer
-            format: int32
-            minimum: 0
-        - in: query
-          name: limit
-          description: maximum number of records to return
-          schema:
-            type: integer
-            format: int32
-            minimum: 0
-            maximum: 50
-      responses:
-        '200':
-          description: search results matching criteria
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/InventoryItem'
-        '400':
-          description: bad input parameter
-    post:
-      tags:
-        - admins
-      summary: adds an inventory item
-      operationId: addInventory
-      description: Adds an item to the system
-      responses:
-        '201':
-          description: item created
-        '400':
-          description: 'invalid input, object invalid'
-        '409':
-          description: an existing item already exists
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/InventoryItem'
-        description: Inventory item to add
-
-
-
   /api/reviews:
     get:
       tags:
         - Reviews
-      summary: Returns all reviews stored
+      summary: Returns all reviews
       operationId: getAllReviews
       description: |
         Default get operation on this path brings back all Movie Reviews stored in repository.
       responses:
         '200':
-          description: search results matching criteria
+          description: JSON Collection of results returned
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/MovieReview'
+                  $ref: '#/components/schemas/ReturnedMovieReview'
         '400':
-          description: bad input parameter
+          description: Bad Request Error
+        '500':
+          description: Server Error
     post:
       tags:
         - Reviews
-      summary: Adds a user movie review
+      summary: Adds a user movie review using TMDB movieId
       operationId: addReview
-      description: Adds a users movie review to database storage
+      description: Adds a users movie review to repository
       parameters:
         - in: query
           name: reviewId
-          description: pass MongoDB review id 
+          description: TMDB movie id for movie being reviewed 
           required: true
           schema:
             type: string
       responses:
         '201':
           description: item created
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ReturnedMovieReview'
+        '400':
+          description: Bad Request Error
         '500':
-          description: 'invalid input, object invalid'
-        '409':
-          description: an existing item already exists
+          description: Server Error
+
+  /api/reviews/id:
+    get:
+      tags:
+        - Reviews
+      summary: | 
+        Returns specific review using MongoDB Document ID
+      operationId: getReview
+      description: |
+        This endpoint brings back the movie review for the supplied MongoDB id.
+      parameters:
+        - in: query
+          name: reviewId
+          description: Pass MongoDB Document id 
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description:   JSON Collection of results returned matching criteria
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ReturnedMovieReview'
+        '400':
+          description: Bad Request Error
+        '500':
+          description: Server Error  
+    put:
+      tags:
+        - Reviews
+      summary: Update a user movie review
+      operationId: updateReview
+      description: Update an existing user movie review using MongoDB Document ID
+      parameters:
+        - in: query
+          name: reviewId
+          description: MongoDB Document ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '201':
+          description: item created
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ReturnedMovieReview'
+        '400':
+          description: Bad Request Error
+        '500':
+          description: Server Error
       requestBody:
         content:
           application/json:
@@ -135,24 +131,25 @@ paths:
               $ref: '#/components/schemas/MovieReview'
         description: Movie review data and metadata
   
-  /api/reviews/id:
+  /api/reviews/id/movie:
     get:
       tags:
         - Reviews
-      summary: Returns specific review
-      operationId: getReview
+      summary: | 
+        Returns specific review using TMDB Movie ID
+      operationId: getReviewByMovieId
       description: |
-        This endpoint brings back the movie review for the supplied mongodb id.
+        This endpoint brings back the movie review for the supplied TMDB Movie ID.
       parameters:
         - in: query
           name: reviewId
-          description: pass MongoDB review id 
+          description: Pass TMDB Movie ID 
           required: true
           schema:
             type: string
       responses:
         '200':
-          description: search results matching criteria
+          description:   JSON collection of reviews for the specific movie id
           content:
             application/json:
               schema:
@@ -161,44 +158,20 @@ paths:
                   $ref: '#/components/schemas/MovieReview'
         '400':
           description: bad input parameter
-    put:
-      tags:
-        - Reviews
-      summary: Update a user movie review
-      operationId: updateReview
-      description: Update an existing user movie review
-      parameters:
-        - in: query
-          name: reviewId
-          description: pass MongoDB review id 
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: item created
         '500':
-          description: 'invalid input, object invalid'
-        '409':
-          description: an existing item already exists
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/MovieReview'
-        description: Movie review data and metadata
-        
+          description: Server Error
+
   /api/reviews/id/delete:
     delete:
       tags:
         - Reviews
-      summary: Delete a user movie review
+      summary: Delete a user movie review using MongoDB Document ID
       operationId: removeReview
-      description: Delete an existing user movie review
+      description: Delete an existing user movie review using MongoDB Document ID
       parameters:
         - in: query
           name: reviewId
-          description: pass MongoDB review id 
+          description: Pass MongoDB Document ID
           required: true
           schema:
             type: string
@@ -211,56 +184,275 @@ paths:
           description: an existing item already exists
 
 
+  /api/actors:
+    get:
+      tags:
+        - Actors
+      summary: | 
+        Returns information on popular actors
+      operationId: getPopularActors
+      description: |
+        Returns information on popular actors from TMDB API
+      responses:
+        '200':
+          description:   JSON Collection of popular actor information
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PopularActors'
+        '400':
+          description: Bad Request Error
+        '500':
+          description: Server Error  
+
+  /api/actors/id:
+    get:
+      tags:
+        - Actors
+      summary: | 
+        Returns information on specific actor using TMDB actor id
+      operationId: getActor
+      description: |
+        Returns information on specific actor using TMDB actor id
+      parameters:
+        - in: query
+          name: actorId
+          description: TMDB Actor ID 
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description:   JSON Collection of results returned matching criteria
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ActorData'
+        '400':
+          description: Bad Request Error
+        '500':
+          description: Server Error  
+          
+  /api/actors/id/actorimage:
+    get:
+      tags:
+        - Actors
+      summary: | 
+        Returns images of specific actor using TMDB actor id
+      operationId: getActorImages
+      description: |
+        Returns images of specific actor using TMDB actor id
+      parameters:
+        - in: query
+          name: actorId
+          description: TMDB Actor ID 
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description:   JSON Collection of results returned matching criteria
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ActorImage'
+        '400':
+          description: Bad Request Error
+        '500':
+          description: Server Error  
+          
+  /api/actors/id/actorcredits:
+    get:
+      tags:
+        - Actors
+      summary: | 
+        Returns combined TV and Movie Credits for an actor
+      operationId: getActorCombinedCredits
+      description: |
+        Returns combined TV and Movie Credits for an actor using TMDB actor id
+      parameters:
+        - in: query
+          name: actorId
+          description: TMDB Actor ID 
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description:   JSON Collection of results returned matching criteria
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ActorCombinedCredits'
+        '400':
+          description: Bad Request Error
+        '500':
+          description: Server Error  
+          
+  /api/actors/review:
+    get:
+      tags:
+        - User Reviews on Actors
+      summary: | 
+        Get all Actor Reviews
+      operationId: actorsController.getAllReviews
+      description: |
+        Get all Actor Reviews from MongoDB Repository
+      responses:
+        '200':
+          description:   Collection of Actor reviews in JSON format
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ReturnedActorReview'
+        '400':
+          description: Bad Request Error
+        '500':
+          description: Server Error  
+
+  /api/actors/id/review:
+    get:
+      tags:
+        - User Reviews on Actors
+      summary: | 
+        Get a review for a specific actor
+      operationId: actorsController.getReview
+      description: |
+        Get a review for a specific actor using MongoDB id from Repository
+      parameters:
+        - in: query
+          name: mongoDB_ID
+          description: MongoDB ID of Review 
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description:   Response with JSON object of review
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ReturnedActorReview'
+        '400':
+          description: Bad Request Error
+        '500':
+          description: Server Error  
+    post:
+      tags:
+        - User Reviews on Actors
+      summary: | 
+        Add a review on an actor
+      operationId: actorsController.addReview
+      description: |
+        Add a review on an actor to MongoDB Repository
+      parameters:
+        - in: query
+          name: actorId
+          description: TMDB Actor ID 
+          required: true
+          schema:
+            type: string
+      responses:
+        '201':
+          description:   Response saying review successfully created and JSON object of review
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ReturnedActorReview'
+        '400':
+          description: Bad Request Error
+        '500':
+          description: Server Error  
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ActorReview'
+        description: Movie review data and metadata
+    put:
+      tags:
+        - User Reviews on Actors
+      summary: | 
+        Add a review on an actor
+      operationId: actorsController.updateReview
+      description: |
+        Add a review on an actor to MongoDB Repository
+      parameters:
+        - in: query
+          name: actorId
+          description: TMDB Actor ID 
+          required: true
+          schema:
+            type: string
+      responses:
+        '201':
+          description:   Response saying review successfully updated and JSON object of review
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ReturnedActorReview'
+        '400':
+          description: Bad Request Error
+        '500':
+          description: Server Error  
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ActorReview'
+        description: Movie review data and metadata
+    delete:
+      tags:
+        - User Reviews on Actors
+      summary: | 
+        Add a review on an actor
+      operationId: actorsController.removeReview
+      description: |
+        Add a review on an actor to MongoDB Repository
+      parameters:
+        - in: query
+          name: actorId
+          description: TMDB Actor ID 
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description:   HTTP Status 204 - No Content
+        '400':
+          description: Bad Request Error
+        '500':
+          description: Server Error  
 
 components:
   schemas:
-    InventoryItem:
-      type: object
-      required:
-        - id
-        - name
-        - manufacturer
-        - releaseDate
-      properties:
-        id:
-          type: string
-          format: uuid
-          example: d290f1ee-6c54-4b01-90e6-d701748f0851
-        name:
-          type: string
-          example: Widget Adapter
-        releaseDate:
-          type: string
-          format: date-time
-          example: '2016-08-29T09:12:33.001Z'
-        manufacturer:
-          $ref: '#/components/schemas/Manufacturer'
-    Manufacturer:
-      required:
-        - name
-      properties:
-        name:
-          type: string
-          example: ACME Corporation
-        homePage:
-          type: string
-          format: url
-          example: 'https://www.acme-corp.com'
-        phone:
-          type: string
-          example: 408-867-5309
-      type: object
     MovieReview:
       type: object
       required:
         - movieId
         - movie
         - author
-        - review
+        - content
         - rating
       properties:
         movieId:
-          type: int
+          type: integer
           example: 266153
         movie:
           type: string
@@ -268,9 +460,370 @@ components:
         author:
           type: string
           example: John Smith
-        review:
+        content:
           type: string
           example: The movie is fast paced from the outset with well orchestrated car chases.
         rating:
-          type: int
+          type: integer
           example: 3
+    ReturnedMovieReview:
+      type: object
+      required:
+        - id
+        - movieId
+        - movie
+        - author
+        - content
+        - rating
+      properties:
+        id:
+          type: string
+          example: 6467d4b319c46e7371aef8a5
+        movieId:
+          type: integer
+          example: 266153
+        movie:
+          type: string
+          example: Bourne Identity
+        author:
+          type: string
+          example: John Smith
+        content:
+          type: string
+          example: The movie is fast paced from the outset with well orchestrated car chases.
+        rating:
+          type: integer
+          example: 3
+    ActorData:
+      type: object
+      required:
+        - adult
+        - also_known_as
+        - biography
+        - birthday
+        - deathday
+        - gender
+        - homepage
+        - id
+        - imdb_id
+        - known_for_department
+        - name
+        - place_of_birth
+        - popularity
+        - profile_path
+      properties:
+        adult:
+          type: string
+          example: false
+        also_known_as:
+          type: string
+          example: [
+        "Ana Celia de Armas",
+        "Ana Celia de Armas Caso",
+        "Ана де Армас",]
+        biography:
+          type: string
+          example: Ana de Armas was born in Cuba on April 30, 1988. At the age of 14, she began her studies at the National Theatre School of Havana, where she graduated after 4 years. She made her film debut with Una rosa de Francia (2006), which was directed by Manuel Gutiérrez Aragón. In 2006 she moved to Spain where she continued her film career, and started doing television. She currently lives between Madrid and Barcelona. Ana is known for her roles in Blade Runner 2049 (2017), Knives Out (2019), and No Time to Die (2021).
+        birthday:
+          type: string
+          example: 1988-04-30
+        deathday:
+          type: string
+          example: 2091-04-30
+        gender:
+          type: integer
+          example: 1
+        homepage:
+          type: string
+          example: https://travolta.com/
+        id:
+          type: integer
+          example: 224513
+        imdb_id:
+          type: string
+          example: nm1869101
+        known_for_department:
+          type: string
+          example: Acting
+        name:
+          type: string
+          example: Ana de Armas
+        place_of_birth:
+          type: string
+          example: Santa Cruz del Norte, Cuba
+        popularity:
+          type: number
+          example: 196.352
+        profile_path:
+          type: string
+          example: /xRk889LiJsKlijIVp8KfHiZWw7X.jpg
+    ActorImage:
+      type: object
+      required:
+        - id
+        - profiles
+        - aspect_ratio
+        - height
+        - iso_639_1
+        - file_path
+        - vote_average
+        - vote_count
+        - width
+      properties:
+        id:
+          type: integer
+          example: 224513
+        profiles:
+          type: object
+          properties:
+            aspect_ratio:
+              type: number
+              example: 0.667
+            height:
+              type: number
+              example: 694
+            iso_639_1:
+              type: number
+              example: null
+            file_path:
+              type: string
+              example: /adQ1j2FQ1FZ67hlZVhsUnALM4G4.jpg
+            vote_average:
+              type: number
+              example: 5.318
+            vote_count:
+              type: number
+              example: 3
+            width:
+              type: number
+              example: 463
+    ActorCombinedCredits:
+      type: object
+      required:
+        - id
+        - profiles
+        - aspect_ratio
+        - height
+        - iso_639_1
+        - file_path
+        - vote_average
+        - vote_count
+        - width
+      properties:
+        cast:
+          type: object
+          properties:
+            adult:
+              type: boolean
+              example: false
+            backdrop_path:
+              type: string
+              example: /yu1pdRBYcfy8Gb9bX4r45JlQqi4.jpg
+            genre_ids:
+              type: number
+              example: [
+                  99,
+                  23,
+                  16,]
+            id:
+              type: integer
+              example: 345466
+            original_language:
+              type: string
+              example: en
+            original_title:
+              type: string
+              example: Stuck In The Waterpark - The Movie
+            overview:
+              type: string
+              example: Follow the fun as the Diaz family (of Disney Channel's \"Stuck in the Middle\") embarks on a family vacation at a water park!
+            popularity:
+              type: number
+              example: 1.464
+            poster_path:
+              type: string
+              example: null
+            release_date:
+              type: string
+              example: 2017-02-03
+            title:
+              type: string
+              example: Stuck In The Waterpark - The Movie
+            video:
+              type: boolean
+              example: false
+            vote_average:
+              type: number
+              example: 8.7
+            vote_count:
+              type: number
+              example: 3
+            character:
+              type: string
+              example: Harley Diaz
+            credit_id:
+              type: string
+              example: 5f0c0a5e1f98d1003724907c
+            order:
+              type: number
+              example: 0
+            media_type:
+              type: string
+              example: movie
+    PopularActors:
+      type: object
+      required:
+        - id
+        - profiles
+        - aspect_ratio
+        - height
+        - iso_639_1
+        - file_path
+        - vote_average
+        - vote_count
+        - width
+      properties:
+        page:
+          type: integer
+          example: 1
+        results:
+          type: object
+          properties:
+            adult:
+              type: boolean
+              example: false
+            gender:
+              type: integer
+              example: 2
+            id:
+              type: integer
+              example: 58021
+            known_for:
+              type: object
+              properties:
+                adult:
+                  type: boolean
+                  example: false
+                backdrop_path:
+                  type: string
+                  example: /yu1pdRBYcfy8Gb9bX4r45JlQqi4.jpg
+                genre_ids:
+                  type: number
+                  example: [
+                      99,
+                      23,
+                      16,]
+                id:
+                  type: integer
+                  example: 345466
+                media_type:
+                  type: string
+                  example: movie
+                original_language:
+                  type: string
+                  example: en
+                original_title:
+                  type: string
+                  example: Stuck In The Waterpark - The Movie
+                overview:
+                  type: string
+                  example: Follow the fun as the Diaz family (of Disney Channel's \"Stuck in the Middle\") embarks on a family vacation at a water park!
+                poster_path:
+                  type: string
+                  example: null
+                release_date:
+                  type: string
+                  example: 2017-02-03
+                title:
+                  type: string
+                  example: Stuck In The Waterpark - The Movie
+                video:
+                  type: boolean
+                  example: false
+                vote_average:
+                  type: number
+                  example: 8.7
+                vote_count:
+                  type: number
+                  example: 3
+                character:
+                  type: string
+                  example: Harley Diaz
+                credit_id:
+                  type: string
+                  example: 5f0c0a5e1f98d1003724907c
+                order:
+                  type: number
+                  example: 0
+            known_for_department:
+              type: string
+              example: Acting      
+            name:
+              type: string
+              example: Ana de Armas  
+            popularity:
+              type: number
+              example: 1.464
+            profile_path:
+              type: string
+              example: /adQ1j2FQ1FZ67hlZVhsUnALM4G4.jpg
+    ActorReview:
+      type: object
+      required:
+        - actorId
+        - firstName
+        - lastName
+        - review
+        - rating
+        - author
+      properties:
+        actorId:
+          type: integer
+          example: 266153
+        firstName:
+          type: string
+          example: Kyleigh
+        lastName:
+          type: string
+          example: Smith
+        review:
+          type: string
+          example: The actor has some potential but needs training
+        rating:
+          type: integer
+          example: 3
+        author:
+          type: string
+          example: Kenneth Douglas
+    ReturnedActorReview:
+      type: object
+      required:
+        - id
+        - actorId
+        - firstName
+        - lastName
+        - review
+        - rating
+        - author
+      properties:
+        id:
+          type: string
+          example: 6467d4b319c46e7371aef8a5
+        actorId:
+          type: integer
+          example: 266153
+        firstName:
+          type: string
+          example: Kyleigh
+        lastName:
+          type: string
+          example: Smith
+        review:
+          type: string
+          example: The actor has some potential but needs training
+        rating:
+          type: integer
+          example: 3
+        author:
+          type: string
+          example: Kenneth Douglas

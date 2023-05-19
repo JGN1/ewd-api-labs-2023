@@ -47,6 +47,7 @@ export default (dependencies) => {
         try {
             // Input
             const authHeader = request.headers.authorization;
+            console.log("contents of authHeader is - "+authHeader);
             // Treatment
             const accessToken = authHeader.split(" ")[1];
             const user = await accountService.verifyToken(accessToken, dependencies);
