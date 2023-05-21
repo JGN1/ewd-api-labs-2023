@@ -40,6 +40,7 @@ export default {
       const response = await axios.get(
         `https://api.themoviedb.org/3/person/popular?api_key=${process.env.TMDB_KEY}&language=en-US`
         // `https://api.themoviedb.org/3/person/popular?api_key=${process.env.TMDB_KEY}&language=en-US&page=${page.queryKey[1]}`
+        // `https://api.themoviedb.org/3/person/popular?api_key=${process.env.TMDB_KEY}&language=en-US&page=1`
       );
       return response.data;
     } catch (error) {

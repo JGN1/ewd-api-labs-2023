@@ -9,6 +9,7 @@
     "test_accounts": "newman run ./tests/accounts_collection.json -e ./tests/MSC_WebDev_API_environment.json --reporters htmlextra,cli --reporter-htmlextra-export ./tests/reports/accounts_report.html",
     "test_actors": "newman run ./tests/actors_collection.json -e ./tests/MSC_WebDev_API_environment.json --reporters htmlextra,cli --reporter-htmlextra-export ./tests/reports/actors_report.html",
     "test_reviews": "newman run ./tests/reviews_collection.json -e ./tests/MSC_WebDev_API_environment.json --reporters htmlextra,cli --reporter-htmlextra-export ./tests/reports/reviews_report.html",
+    "test_regression": "newman run ./tests/regression_collection.json -e ./tests/MSC_WebDev_API_environment.json --reporters htmlextra,cli --reporter-htmlextra-export ./tests/reports/regression_report.html",
     "testVerbose": "newman run ./tests/movies_collection.json -e ./tests/movies_environment.json --reporters htmlextra,cli --reporter-htmlextra-export ./tests/reports/report.html --verbose "
   },
   "author": "JGN1",

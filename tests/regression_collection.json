@@ -1,0 +1,1090 @@
+{
+	"info": {
+		"_postman_id": "b1c3b570-ff7a-44d6-8e1c-d9110fa93e1b",
+		"name": "MSC WebDev API -  Full Regression",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "3789946"
+	},
+	"item": [
+		{
+			"name": "Account  - Create New Acc",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const jsonData = pm.response.json();\r",
+							"pm.collectionVariables.set('firstName', jsonData.firstName);\r",
+							"pm.collectionVariables.set('lastName', jsonData.lastName);\r",
+							"pm.collectionVariables.set('email', jsonData.email);\r",
+							"pm.collectionVariables.set('password', jsonData.password);\r",
+							"\r",
+							"pm.test(\"Account - Create New Acc - Status code is 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"pm.test(\"Account - Create New Acc - Authenticate Account Data\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData).to.have.property(\"email\");\r",
+							"    pm.expect(jsonData.password).to.be.not.null;\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.collectionVariables.set(\"firstName\", pm.variables.replaceIn('{{$randomFirstName}}'))\r",
+							"pm.collectionVariables.set(\"lastName\",pm.variables.replaceIn('{{$randomLastName}}'))\r",
+							"pm.collectionVariables.set(\"email\", pm.variables.replaceIn('{{$randomEmail}}'))\r",
+							"pm.collectionVariables.set(\"password\",\"Bean2023!\")\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"firstName\": \"{{firstName}}\",\r\n  \"lastName\": \"{{lastName}}\",\r\n  \"email\": \"{{email}}\",\r\n  \"password\": \"Bean2023!\"\r\n}\r\n\r\n\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "127.0.0.1:8080/api/accounts",
+					"host": [
+						"127.0.0.1"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"accounts"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Account - Authenticate Account Data",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const jsonData = pm.response.json();\r",
+							"pm.globals.set('BearerToken', jsonData.token.split(' ')[1]);\r",
+							"pm.test(\"Account - Authenticate Account Data - Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"pm.test(\"Account - Authenticate Account Data\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData).to.have.property(\"token\");\r",
+							"    pm.expect(jsonData.token).to.be.not.null;\r",
+							"    pm.expect(jsonData.token).contain(\"BEARER\");\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"firstName\": \"{{firstName}}\",\r\n  \"lastName\": \"{{lastName}}\",\r\n  \"email\": \"{{email}}\",\r\n  \"password\": \"Bean2023!\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "127.0.0.1:8080/api/accounts/security/token",
+					"host": [
+						"127.0.0.1"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"accounts",
+						"security",
+						"token"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Actors - Get Popular",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const jsonData = pm.response.json();\r",
+							"pm.collectionVariables.set('actorId', jsonData.results[0].id);\r",
+							"\r",
+							"pm.test(\"Get Popular Actors - Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"pm.test(\"Get Popular Actors - Validate Data Returned\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.name).to.be.not.null;\r",
+							"    pm.expect(jsonData.known_for).to.be.not.null;\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "127.0.0.1:8080/api/actors",
+					"host": [
+						"127.0.0.1"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"actors"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Actors - Get Specific",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Get Specific Actor - Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"pm.test(\"Get Specific Actor - Validate Data Returned\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.name).to.be.not.null;\r",
+							"    pm.expect(jsonData.known_for).to.be.not.null;\r",
+							"});\r",
+							"pm.test(\"Get Specific Actor - Check Actor ID matches in Response\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.id).to.eql(parseInt(pm.collectionVariables.replaceIn('{{actorId}}')));\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "127.0.0.1:8080/api/actors/{{actorId}}",
+					"host": [
+						"127.0.0.1"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"actors",
+						"{{actorId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Actors - Get Image",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Get Actor Image - Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Get Actor Image - Validate Data Returned\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData).to.have.property(\"profiles\");\r",
+							"    pm.expect(jsonData.profiles[0]).to.have.property(\"file_path\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Get Actor Image - Check Actor ID matches in Response\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.id).to.eql(parseInt(pm.collectionVariables.replaceIn('{{actorId}}')));\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "127.0.0.1:8080/api/actors/{{actorId}}/actorimage",
+					"host": [
+						"127.0.0.1"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"actors",
+						"{{actorId}}",
+						"actorimage"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Actors - Get Combined Credits",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Get Actor Image - Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Get Actor Image - Validate Data Returned\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData).to.have.property(\"cast\");\r",
+							"    pm.expect(jsonData.cast[0]).to.have.property(\"overview\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Get Actor Image - Check Actor ID matches in Response\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.id).to.eql(parseInt(pm.collectionVariables.replaceIn('{{actorId}}')));\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "127.0.0.1:8080/api/actors/{{actorId}}/actorcredits",
+					"host": [
+						"127.0.0.1"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"actors",
+						"{{actorId}}",
+						"actorcredits"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Actors - Add Actor Review",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.collectionVariables.set(\"actorId\", parseInt(pm.collectionVariables.replaceIn('{{actorId}}')))\r",
+							"pm.collectionVariables.set(\"firstName\", pm.variables.replaceIn('{{$randomFirstName}}'))\r",
+							"pm.collectionVariables.set(\"lastName\", pm.variables.replaceIn('{{$randomLastName}}'))\r",
+							"pm.collectionVariables.set(\"review\", pm.variables.replaceIn('{{$randomCatchPhrase}} {{$randomPhrase}}'))\r",
+							"pm.collectionVariables.set(\"rating\", pm.variables.replaceIn('{{$randomInt}}'))\r",
+							"pm.collectionVariables.set(\"author\", pm.variables.replaceIn('{{$randomFullName}}'))\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const jsonData = pm.response.json();\r",
+							"pm.collectionVariables.set('mongoDB_Id', jsonData.id);\r",
+							"\r",
+							"pm.test(\"Add Actor Review - Status code is 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"pm.test(\"Add Actor Review - Response time is less than 200ms\", function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(200);\r",
+							"});\r",
+							"pm.test(\"Add Actor Review - Check Actor ID matches in Response\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.actorId).to.eql(parseInt(pm.collectionVariables.replaceIn('{{actorId}}')));\r",
+							"});\r",
+							"pm.test(\"Add Actor Review - Validate Response content\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData).to.have.property(\"id\");\r",
+							"    pm.expect(jsonData).to.have.property(\"review\");\r",
+							"    pm.expect(jsonData.id).to.be.not.null;\r",
+							"});\r",
+							"\r",
+							"var schema = {    \r",
+							"    \"id\": \"string\",\r",
+							"    \"actorId\": \"int\",\r",
+							"    \"firstName\": \"string\",\r",
+							"    \"lastName\": \"string\",\r",
+							"    \"review\": \"string\",\r",
+							"    \"rating\": \"int\"\r",
+							"};\r",
+							"\r",
+							"var data1 = [true, false];\r",
+							"var data2 = [true, 123];\r",
+							"\r",
+							"pm.test('Add Actor Review - Schema is valid', function () {\r",
+							"    pm.expect(tv4.validate(data1, schema)).to.be.true;\r",
+							"    pm.expect(tv4.validate(data2, schema)).to.be.true;\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"actorId\": {{actorId}},\r\n    \"firstName\": \"{{firstName}}\",\r\n    \"lastName\": \"{{lastName}}\",\r\n    \"review\": \"{{review}}\",\r\n    \"rating\": {{rating}},\r\n    \"author\": \"{{author}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "127.0.0.1:8080/api/actors/{{actorId}}/review",
+					"host": [
+						"127.0.0.1"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"actors",
+						"{{actorId}}",
+						"review"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Actors - Get Specific Review",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Actors - Get Specific Review - Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Actors - Get Specific Review - Validate Data Returned\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData).to.have.property(\"actorId\");\r",
+							"    pm.expect(jsonData).to.have.property(\"review\");\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "127.0.0.1:8080/api/actors/{{mongoDB_Id}}/review",
+					"host": [
+						"127.0.0.1"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"actors",
+						"{{mongoDB_Id}}",
+						"review"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Actors - Update Review",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.collectionVariables.set(\"actorId\", parseInt(pm.collectionVariables.replaceIn('{{actorId}}')))\r",
+							"pm.collectionVariables.set(\"firstName\", pm.variables.replaceIn('{{$randomFirstName}}'))\r",
+							"pm.collectionVariables.set(\"lastName\", pm.variables.replaceIn('{{$randomFullName}}'))\r",
+							"pm.collectionVariables.set(\"review\", pm.variables.replaceIn('{{$randomCatchPhrase}} {{$randomPhrase}}'))\r",
+							"pm.collectionVariables.set(\"rating\", pm.variables.replaceIn('{{$randomInt}}'))\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Add Actor Review - Status code is 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"pm.test(\"Add Actor Review - Response time is less than 200ms\", function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(200);\r",
+							"});\r",
+							"pm.test(\"Add Actor Review - Check Actor ID matches in Response\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.actorId).to.eql(parseInt(pm.collectionVariables.replaceIn('{{actorId}}')));\r",
+							"});\r",
+							"pm.test(\"Add Actor Review - Validate Response content\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData).to.have.property(\"id\");\r",
+							"    pm.expect(jsonData).to.have.property(\"review\");\r",
+							"    pm.expect(jsonData.id).to.be.not.null;\r",
+							"});\r",
+							"\r",
+							"var schema = {    \r",
+							"    \"id\": \"string\",\r",
+							"    \"actorId\": \"int\",\r",
+							"    \"firstName\": \"string\",\r",
+							"    \"lastName\": \"string\",\r",
+							"    \"review\": \"string\",\r",
+							"    \"rating\": \"int\"\r",
+							"};\r",
+							"\r",
+							"var data1 = [true, false];\r",
+							"var data2 = [true, 123];\r",
+							"\r",
+							"pm.test('Add Actor Review - Schema is valid', function () {\r",
+							"    pm.expect(tv4.validate(data1, schema)).to.be.true;\r",
+							"    pm.expect(tv4.validate(data2, schema)).to.be.true;\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"actorId\": {{actorId}},\r\n    \"firstName\": \"TEST_SUCCESS\",\r\n    \"lastName\": \"{{lastName}}\",\r\n    \"review\": \"{{review}}\",\r\n    \"rating\": {{rating}},\r\n    \"author\": \"{{author}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "127.0.0.1:8080/api/actors/{{mongoDB_Id}}/review",
+					"host": [
+						"127.0.0.1"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"actors",
+						"{{mongoDB_Id}}",
+						"review"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Actors - Delete Review",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Delete Actor Review - Status code is 204\", function () {\r",
+							"    pm.response.to.have.status(204);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "127.0.0.1:8080/api/actors/{{mongoDB_Id}}/deleteReview",
+					"host": [
+						"127.0.0.1"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"actors",
+						"{{mongoDB_Id}}",
+						"deleteReview"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Actors - Get All Reviews",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "127.0.0.1:8080/api/actors/review",
+					"host": [
+						"127.0.0.1"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"actors",
+						"review"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Movies: Valid Token",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Get Movies: Status code is 200\",  ()=> {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Get Movies: Content-Type is correct\", function () {\r",
+							"   pm.expect(pm.response.headers.get('Content-Type')).to.contain('application/json');\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Get Movies: Response time is less than 400ms\", () => {\r",
+							"  pm.expect(pm.response.responseTime).to.be.below(400);\r",
+							"});\r",
+							"\r",
+							"const jsonData = pm.response.json();\r",
+							"\r",
+							"pm.test(\"Get Movies: Test movie data of response\", () => {\r",
+							"  pm.expect(jsonData).to.be.an(\"object\");\r",
+							"  pm.expect(jsonData.page).to.be.a(\"number\");\r",
+							"  pm.expect(jsonData.results).to.be.an(\"array\").length.lessThan(21);\r",
+							"  aMovie=jsonData.results[0]\r",
+							"  pm.expect(aMovie).to.have.property(\"id\");\r",
+							"  pm.expect(aMovie).to.have.property(\"title\");\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{BearerToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/api/movies",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"api",
+						"movies"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Movies: Invalid Token",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"   var jsonData = pm.response.json();\r",
+							"\r",
+							"  pm.test(\"Invalid Token: Correct Response\", function () {\r",
+							"     pm.expect(pm.response.code).to.be.oneOf([500,401,403]);\r",
+							"     pm.expect(jsonData).to.be.an(\"object\");\r",
+							"     pm.expect(jsonData).to.have.property(\"error\");\r",
+							"  });\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "a_bad_token!!!!",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/api/movies",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"api",
+						"movies"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Reviews - Add New",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.collectionVariables.set(\"movieId\", pm.variables.replaceIn('{{$randomInt}}'))\r",
+							"pm.collectionVariables.set(\"movie\", pm.variables.replaceIn('{{$randomFirstName}}'))\r",
+							"pm.collectionVariables.set(\"fullName\", pm.variables.replaceIn('{{$randomFullName}}'))\r",
+							"pm.collectionVariables.set(\"reviewText\", pm.variables.replaceIn('{{$randomCatchPhrase}} {{$randomPhrase}}'))\r",
+							"pm.collectionVariables.set(\"rating\", pm.variables.replaceIn('{{$randomInt}}'))\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const jsonData = pm.response.json();\r",
+							"pm.collectionVariables.set('reviewId', jsonData.id);\r",
+							"pm.collectionVariables.set('movieId', jsonData.movieId);\r",
+							"\r",
+							"pm.test(\"Reviews - Add New: Successful Response\",()=>pm.response.to.have.status(201))\r",
+							"\r",
+							"pm.test(\"Reviews - Add New: Response Object contains movie name\",()=>{\r",
+							"    pm.expect(jsonData).to.have.property(\"movie\");\r",
+							"    pm.expect(jsonData.movie).to.be.a(\"string\");\r",
+							"  })\r",
+							"\r",
+							"pm.test(\"Reviews - Add New: Response contains content\",()=>{\r",
+							"    pm.expect(jsonData).to.have.property(\"content\");\r",
+							"    pm.expect(jsonData.content).to.be.a(\"string\");\r",
+							"  })"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"movieId\": {{movieId}},\r\n    \"movie\": \"{{movie}}\",\r\n    \"author\": \"{{fullName}}\",\r\n    \"content\": \"{{reviewText}}\",\r\n    \"rating\": {{rating}}\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "127.0.0.1:8080/api/reviews",
+					"host": [
+						"127.0.0.1"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"reviews"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Reviews - Get All",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const jsonData = pm.response.json();\r",
+							"pm.test(\"Reviews - Get All: Successful Response\",()=>pm.response.to.have.status(200))\r",
+							"\r",
+							"pm.test(\"Reviews - Get All: Response Object contains movie name\",()=>{\r",
+							"    pm.expect(jsonData[0]).to.have.property(\"movie\");\r",
+							"    pm.expect(jsonData[0].movie).to.be.a(\"string\");\r",
+							"  })\r",
+							"\r",
+							"pm.test(\"Reviews - Get All: Response contains content\",()=>{\r",
+							"    pm.expect(jsonData[0]).to.have.property(\"content\");\r",
+							"    pm.expect(jsonData[0].content).to.be.a(\"string\");\r",
+							"  })"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{BearerToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"movieId\": 12345678,\r\n    \"movie\": \"Shaft\",\r\n    \"author\": \"Joe Bloggs\",\r\n    \"review\": \"this is a fairly good film\",\r\n    \"rating\": 2\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "127.0.0.1:8080/api/reviews",
+					"host": [
+						"127.0.0.1"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"reviews"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Reviews - Mongo ID - Get Specific Review",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const jsonData = pm.response.json();\r",
+							"pm.test(\"Reviews - Mongo ID - Get Specific Review: Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Reviews - Mongo ID - Get Specific Review: Review updated\",()=>{\r",
+							"    pm.expect(jsonData).to.have.property(\"content\");\r",
+							"    pm.expect(jsonData.content).to.be.a(\"string\");\r",
+							"    pm.expect(jsonData.id).to.eql(pm.collectionVariables.replaceIn(\"{{reviewId}}\"));\r",
+							"  })\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "127.0.0.1:8080/api/reviews/{{reviewId}}",
+					"host": [
+						"127.0.0.1"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"reviews",
+						"{{reviewId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Reviews - Movie ID - Get Specific Review",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const jsonData = pm.response.json();\r",
+							"pm.test(\"Reviews - Movie ID - Get Specific Review: Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Reviews - Movie ID - Get Specific Review: Review updated\",()=>{\r",
+							"    pm.expect(jsonData[0]).to.have.property(\"content\");\r",
+							"    pm.expect(jsonData[0].content).to.be.a(\"string\");\r",
+							"    pm.expect(jsonData[0].movieId).to.eql(pm.collectionVariables.get(\"movieId\"));\r",
+							"  })\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{BearerToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "127.0.0.1:8080/api/reviews/{{movieId}}/movie",
+					"host": [
+						"127.0.0.1"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"reviews",
+						"{{movieId}}",
+						"movie"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Reviews - Update Review",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const jsonData = pm.response.json();\r",
+							"pm.test(\"Reviews - Update Review: Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Reviews - Update review: Review updated\",()=>{\r",
+							"    pm.expect(jsonData).to.have.property(\"content\");\r",
+							"    pm.expect(jsonData.content).to.be.a(\"string\");\r",
+							"    pm.expect(jsonData.content).to.eql(\"This updated review, This updated review, This updated review\");\r",
+							"  })"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"movieId\": 1001,\r\n    \"movie\": \"It is updated\",\r\n    \"author\": \"Joe Roche\",\r\n    \"content\": \"This updated review, This updated review, This updated review\",\r\n    \"rating\": 101\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "127.0.0.1:8080/api/reviews/{{reviewId}}",
+					"host": [
+						"127.0.0.1"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"reviews",
+						"{{reviewId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Reviews - Delete Review",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Reviews - Delete Review: Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(204);\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"movieId\": 1001,\r\n    \"movie\": \"It is updated\",\r\n    \"author\": \"Joe Roche\",\r\n    \"content\": \"This updated review, This updated review, This updated review\",\r\n    \"rating\": 101\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "127.0.0.1:8080/api/reviews/{{reviewId}}/delete",
+					"host": [
+						"127.0.0.1"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"reviews",
+						"{{reviewId}}",
+						"delete"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "firstName",
+			"value": ""
+		},
+		{
+			"key": "lastName",
+			"value": ""
+		},
+		{
+			"key": "email",
+			"value": ""
+		},
+		{
+			"key": "password",
+			"value": ""
+		},
+		{
+			"key": "actorId",
+			"value": ""
+		},
+		{
+			"key": "review",
+			"value": ""
+		},
+		{
+			"key": "rating",
+			"value": ""
+		},
+		{
+			"key": "author",
+			"value": ""
+		},
+		{
+			"key": "mongoDB_Id",
+			"value": ""
+		},
+		{
+			"key": "movieId",
+			"value": ""
+		},
+		{
+			"key": "movie",
+			"value": ""
+		},
+		{
+			"key": "fullName",
+			"value": ""
+		},
+		{
+			"key": "reviewText",
+			"value": ""
+		},
+		{
+			"key": "reviewId",
+			"value": ""
+		}
+	]
+}

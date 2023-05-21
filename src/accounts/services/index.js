@@ -56,13 +56,17 @@ export default {
     }
   },
   verifyToken: async (token, { accountsRepository, tokenManager }) => {
-      const decoded = await tokenManager.decode(token);
-      const user = await accountsRepository.getByEmail(decoded.email);
-      if (!user) {
-        throw new Error('Bad token');
+      try {
+        const decoded = await tokenManager.decode(token);
+        const user = await accountsRepository.getByEmail(decoded.email);
+        if (!user) {
+          throw new Error('Bad token');
+        }
+        console.log("got past throw");
+        return user.email;
+      } catch (error) {
+        logger.error(new Error(error));
       }
-      console.log("got past throw");
-      return user.email;
   },
   getFavourites: async (accountId, { accountsRepository }) => {
     try {
