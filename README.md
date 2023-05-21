@@ -128,6 +128,86 @@ As I had intended trying to hook Swagger up with my API, I built out all the rel
 
 [Give details of the routes that have authentication. ]
 
+For security and authentication there are two elements that need to be examined:
++ Security and authentication for react Movie App
++ Security and authentication for API
+<br/>
+<br/>
+
+__Security and authentication for react Movie App__
+
+For the react application I already had authentication in place using SUPABASE user authentication. For this assignment I set up a stage environment which uses the API Accounts endpoint for authentication. Specific details of how this was implemented are included in the [Integrating with React App](#integrating-with-react-app) section of this report. 
+
+After making these changes, protected routes, such as opening an actors details page became unavailable unless logged in - essentially my API authentication took the place of the SUPABASE authentication for the React Movie App protected routes. These protected routes are as follows...
+~~~JavaScript
+  <MoviesContextProvider>
+    <Routes>
+      {/* Items within the AuthRoute route element require authentication to access  */}
+      <Route element={<AuthRoute />}>
+        <Route path="/movies/favourites" element={<FavouriteMoviesPage />} />
+        <Route path="/movies/watchlist" element={<WatchlistMoviesPage />} />
+        <Route path="/actors/profile/:id" element={<ActorDetailsPage />} />
+        <Route path="/reviews/form" element={<AddMovieReviewPage />} />
+        <Route path="/reviews/:id" element={<MovieReviewPage />} />
+      </Route>
+~~~
+<br/>
+<br/>
+
+__Security and authentication for API__
+
+For the API security and authentication, I sent request to my API to authenticate the user using the following function in `ewd-api-jn-2023`...
+~~~JavaScript
+  export const login = (email, password) => {
+    return fetch('/api/accounts/security/token', {
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        method: 'post',
+        body: JSON.stringify({ email: email, password: password })
+    }).then(res => res.json())
+  };
+~~~
+
+And then set the Authorization header in `contexts/authProvider` using the following code...
+~~~JavaScript
+  const setToken = (data) => {
+    localStorage.setItem("token", data);
+    setAuthToken(data);
+  }
+
+  const authenticate = async (email, password) => {
+    const result = await login(email, password);
+    if (result.token != undefined) {
+      setToken(result.token)
+      setAuth(true);
+      setEmail(email);
+      setUser(email);
+    }
+  };
+~~~
+
+I then utilised the authorization header in my fetch request as follows for protected route calls... 
+~~~JavaScript
+export const getApiMovieReviews = (movieId) => {
+    return fetch(
+        `/api/reviews/${movieId}/movie`, {
+            headers: {
+                'Authorization': window.localStorage.getItem('token')
+            }
+        }
+    ).then((res) => res.json());
+};
+~~~
+The following screenshot from my Chrome DevTool shows the JWT Bearer_token in Local Storage
+
+![][image20]
+
+This bearer token is passed to my API via the Authorization Header and used to verify the user is authorised to make teh call they are attempting to invoke.
+
+I have built out logic in the react review drawer to illustrate changing information displayed based on whether individual logged in or not. 
+
+This can be seen under the [Integrating with React App](#integrating-with-react-app) section of this report. 
 <br/>
 <br/>
 
@@ -253,9 +333,9 @@ The `VITE_NODE_ENV` and `VITE_AUTH_API` environmental variables are used as effe
 <br/>
 
 ### __Integration for Authentication__
-I wanted to minimise changes to get my React application to interact with my API for authentication . To achieve this I used a combination of total rewrite/replacement of `contexts\authProvider.jsx` file and two other files - `login.jsx` and `profileIcon/index.jsx`. 
+I wanted to minimise changes to get my React application to interact with my API for authentication . To achieve this I used a combination of total rewrite/replacement of `contexts\authProvider.jsx` file, followed by alterations to two other files - `login.jsx` and `profileIcon/index.jsx`. 
 
-Having code for both SUPABASE and my API in the one file would have been too cluttered, so I opted to rewrite content of the file on startup depending on the environment choosen. The `authProvider` file used for my API is similar to that used for the react app in the labs with some minor alterations to fit in with my React code.
+Having code for both SUPABASE and my API in the one file would have been too cluttered, so I opted to rewrite the content of the `contexts\authProvider.jsx` file on startup, with the content depending on the environment choosen. The `authProvider` file used for my API is similar to that used for the react app in the labs with some minor alterations to fit in with my React code.
 
 ~~~JavaScript
 import React, { useState, useContext, createContext } from "react";
@@ -326,7 +406,7 @@ const AuthContextProvider = (props) => {
 export default AuthContextProvider;
 ~~~
 
-After setting up the rewrite of the `authProvider` file, I needed to alterthe following two files:
+After setting up the rewrite of the `authProvider` file, I needed to alter the following two files:
 + src/pages/login.jsx
 + src/components/profileIcon/index.jsx
 
@@ -338,7 +418,7 @@ with
 ~~~JavaScript
 const { login, authenticate } = useAuth();
 ~~~
-This allowed me to use method from either SUPABASE or API authProvider context. I then replaced the following code in the handleSubmit function
+This allowed me to use methods from either SUPABASE or API authProvider context. I then replaced the following code in the handleSubmit function...
 ~~~JavaScript
       const {
         data: { user, session },
@@ -347,9 +427,9 @@ This allowed me to use method from either SUPABASE or API authProvider context. 
       if (error) setErrorMsg(error.message);
       if (user && session) navigate("/");
 ~~~
-with 
+with... 
 ~~~JavaScript
-if (import.meta.env.VITE_AUTH_API == "SUPABASE") {
+      if (import.meta.env.VITE_AUTH_API == "SUPABASE") {
         console.log("in login.jsx - 1 - SUPABASE");
         const {
           data: { user, session },
@@ -376,7 +456,7 @@ The `components/profileIcon/index.jsx` page essentially manages the session of a
 ![][image14]
 ![][image15]
 
-To make teh code compatible with both APIs the following code changes were necessary. Replaced...
+To make the code compatible with both APIs the following code changes were necessary. I replaced...
 ~~~JavaScript
 const { error } = await signOut();
 ~~~
@@ -384,11 +464,11 @@ with...
 ~~~JavaScript
 await signout();
 ~~~
-to cover differences in method naming depending on whether SUPABSE or API and also `const { error }` throws errors when app pointed to API. I also refactored the name of the `signOut()` method in the SUPABASE authProvider context file to `signout()`. 
+to cover differences in method naming depending on whether SUPABSE or API. Also `const { error }` throws errors when app pointed to API. I also refactored the name of the `signOut()` method in the SUPABASE authProvider context file to `signout()`. 
 
 The second section of code changed was as follows...
 ~~~JavaScript
-if (import.meta.env.VITE_AUTH_API == "SUPABASE") {
+  if (import.meta.env.VITE_AUTH_API == "SUPABASE") {
     // setName = props.user;
     var displayName = props.user;
   }
@@ -403,14 +483,36 @@ Finally, I altered the returned component to remove reference to `props.user` in
 
 Before...
 ~~~JavaScript
-<MenuItem onClick={handleClose}>
-  <Avatar /> {props.user}
+  <MenuItem onClick={handleClose}>
+    <Avatar /> {props.user}
 ~~~
 After...
 ~~~JavaScript
   <MenuItem onClick={handleClose}>        
     <Avatar /> {displayName}
 ~~~
+
+[Security and Authentication](#security-and-authentication)
+
+After making these changes, protected routes, such as opening an actors details page became unavailable unless logged in - essentially my API authentication took the place of the SUPABASE authentication for the React Movie App protected routes. These protected routes are as follows...
+~~~JavaScript
+  <MoviesContextProvider>
+    <Routes>
+      {/* Items within the AuthRoute route element require authentication to access  */}
+      <Route element={<AuthRoute />}>
+        <Route path="/movies/favourites" element={<FavouriteMoviesPage />} />
+        <Route path="/movies/watchlist" element={<WatchlistMoviesPage />} />
+        <Route path="/actors/profile/:id" element={<ActorDetailsPage />} />
+        <Route path="/reviews/form" element={<AddMovieReviewPage />} />
+        <Route path="/reviews/:id" element={<MovieReviewPage />} />
+      </Route>
+~~~
+
+Additionally, by logging in with my API, a JWT Bearer Token is added to the Authorization Header...
+
+![][image20]
+
+This bearer token is passed to my API via the Authorization Header and used to verify the user is authorised to access the information.
 <br/>
 <br/>
 
@@ -420,7 +522,118 @@ For the Review API functionality I wanted to carry out a few functions
 + Check for reviews for particular movie, and if not present give option to add review
 + Display existing reviews for a movie
 
-In addition to adding the API file and VITE proxy forwarding as described [General changes for Integration](#General changes for Integration__) section, the following files were 
+In addition to adding the API file and VITE proxy forwarding as described [General changes for Integration](#general-changes-for-integration) section, the following files were altered...
++ src/contexts/moviesContext.jsx
++ src/components/movieReviews/index.jsx
+
+The following changes were made to the `contexts/moviesContext.jsx` file. Firstly I needed to add an import for the `ewd-api-jn-2023` api file.
+~~~JavaScript
+  import {apiAddReview} from "../api/ewd-api-jn-2023";
+~~~
+Then in the addReview function of the script I added call to teh apiAddReview endpoint.
+~~~JavaScript
+  const addReview = (movie, review) => {   
+    apiAddReview(movie.id, movie.original_title, review.author, review.review, review.rating);
+    setMyReviews( {...myReviews, [movie.id]: review } )
+  };
+~~~
+These changes pointed the MovieContext to my API so I was then able to make the other required changes.
+
+In `components/movieReviews/index.jsx`, built in quite a bit of logic to deal with the three possible states...
++ State where user not logged in
++ State where user logged in but no reviews
++ State where user logged in and reviews exist
+
+The first change was to import the `getApiMovieReviews` function from my API file...
+~~~JavaScript
+  import { getApiMovieReviews } from "../../api/ewd-api-jn-2023";
+~~~
+I then added various useState constants that I would utilise later in the file...
+~~~JavaScript
+  const [checkResponse, setCheckResponse] = useState(false);
+  const [responseComment, setResponseComment] = useState();
+  const [responseLink, setResponseLink] = useState();
+  const [responseLinkText, setResponseLinkText] = useState();
+  const [responseState, setResponseState] = useState();
+~~~
+I then needed to add 'switch' to the `useEffect()` section of the script. For SUPABASE (dev environment) I added teh following...
+~~~JavaScript
+ if (import.meta.env.VITE_AUTH_API == "SUPABASE") {
+      getMovieReviews(movie.id).then((rev) => {
+        setReviews(rev);
+        setCheckResponse(true);
+      });
+    }
+~~~
+For the API MONGODB (stage environment), the code was a bit more complex...
+~~~JavaScript
+if (import.meta.env.VITE_AUTH_API == "MONGODB") {
+      try {
+        getApiMovieReviews(movie.id).then((rev) => {
+
+          setReviews(rev);
+          const authToken = localStorage.getItem('token');
+          try {
+            var accessToken = authToken.split(" ")[0];
+          } catch (error) {
+            var accessToken = 'NotLoggedIn';
+          }
+          
+          if (rev.length > 0 && accessToken == 'BEARER') {
+            setCheckResponse(true);
+            console.log("Reviews exist and logged in");
+          };
+          if (rev.error == "Error: Verification Failed jwt must be provided") {
+            setCheckResponse(false);
+            setResponseComment("To see your Reviews Please Log In");
+            setResponseLink("/login");
+            setResponseLinkText("Login");
+            console.log(" JWT ERROR - Reviews Please Log IN");
+          };
+          if ((rev.length == 0 && authToken == null)|(rev.length > 0 && authToken == null)) {
+            setCheckResponse(false);
+            setResponseComment("To see your Reviews Please Log In");
+            setResponseLink("/login");
+            setResponseLinkText("Login");
+            console.log(" Reviews Please Log IN");
+          };
+          if (rev.length == 0 && accessToken == 'BEARER') {
+            setCheckResponse(false);
+            setResponseLink("/reviews/form");
+            setResponseState("state={{movieId: movie.id,}}")
+            setResponseLinkText("Add Review");
+            setResponseComment("You have not added any reviews yet");
+            console.log(" no reviews yet");
+          };
+        });
+      } catch (error) {
+        setResponseComment("To see your Reviews Please Log In");
+        setCheckResponse(false);
+      }
+    }
+~~~
+To better describe what this code does I have included the following screenshots. 
+
+Review drawer display where user not logged in..
+![][image16]
+
+Review drawer display where user logged in but no reviews exist...
+![][image17]
+
+Review drawer display where user logged in and reviews exist...
+![][image18]
+
+For the first two situations, different links are displayed for the users convenience.
++ The first link to Login page 
++ The second link is to the Add Review page, and adds the movie object to the state so the user is brought to review form with correct images and movie details displayed...
+![][image19]
+
+
+
+
+
+
+
 
 
 
@@ -475,15 +688,9 @@ Try/Catch on items feeding out to Logger
 + ++ file copy, environments for REACT STAGE DEV, import.meta.env.____
 
 . . State the non-standard aspects of React/Express/Node (or other related technologies) that you researched and applied in this assignment . .  
+<br/>
+<br/>
 
----------------------------------------------------------------------
-## Security and Authentication
-Mention the varying options when opening reviews
-+ User not logged in - login
-+ User logged in but no reviews - add review - security check here
-+ Display user reviews - again security validation here
-Also the original protected routes in React app still protected through alterations to profileIcon/index.jsx to set 'user' and 'auth' values, as well as JWT Bearer Token for API
-## Testing
 ADDED TRY/CATCH to Accounts endpoint also to prevent app crashing on error
 
 
@@ -502,4 +709,9 @@ ADDED TRY/CATCH to Accounts endpoint also to prevent app crashing on error
 [image13]: readme_images/13_ProfileIcon_Logged_Out.png
 [image14]: readme_images/14_ProfileIcon_Logged_In.png
 [image15]: readme_images/15_ProfileIcon_Logged_In_Menu.png
+[image16]: readme_images/16_Review_Drawer_Logged_Out.png
+[image17]: readme_images/17_Review_Drawer_Logged_In_No_Review.png
+[image18]: readme_images/18_Review_Drawer_Logged_In_Reviews.png
+[image19]: readme_images/19_Review_Form_With_Movie_State.png
+[image20]: readme_images/20_Bearer_Token_in_DevTools.png
 
