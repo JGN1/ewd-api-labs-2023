@@ -35,7 +35,7 @@ export default (dependencies) => {
             // Treatment
             const deletedReview = await reviewService.removeReview(reviewId, dependencies);
             //output
-            response.status(200).json(deletedReview);
+            response.status(204).json(deletedReview);
         } catch (error) {
             logger.error(new Error(error));
         }

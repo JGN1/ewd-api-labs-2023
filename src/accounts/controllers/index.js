@@ -4,33 +4,50 @@ import logger from "../../logger";
 export default (dependencies) => {
 
     const createAccount = async (request, response, next) => {
-        // Input
-        const { firstName, lastName, email, password } = request.body;
-        // Treatment
-        const account = await accountService.registerAccount(firstName, lastName, email, password, dependencies);
-        //output
-        response.status(201).json(account);
+        try {
+            // Input
+            const { firstName, lastName, email, password } = request.body;
+            // Treatment
+            const account = await accountService.registerAccount(firstName, lastName, email, password, dependencies);
+            //output
+            response.status(201).json(account);
+        } catch (error) {
+            response.status(500).json(error);
+            logger.error(new Error(error));
+        }
     };
     const getAccount = async (request, response, next) => {
-        //input
-        const accountId = request.params.id;
-        // Treatment
-        const account = await accountService.getAccount(accountId, dependencies);
-        //output
-        response.status(200).json(account);
+        try {
+            //input
+            const accountId = request.params.id;
+            // Treatment
+            const account = await accountService.getAccount(accountId, dependencies);
+            //output
+            response.status(200).json(account);
+        } catch (error) {
+            logger.error(new Error(error));
+        }
     };
     const listAccounts = async (request, response, next) => {
-        // Treatment
-        const accounts = await accountService.find(dependencies);
-        //output
-        response.status(200).json(accounts);
+        try {
+            // Treatment
+            const accounts = await accountService.find(dependencies);
+            //output
+            response.status(200).json(accounts);
+        } catch (error) {
+            logger.error(new Error(error));
+        }
     };
     const updateAccount = async (request, response, next) => {
-        // Input
-        const id = request.params.id;
-        const { firstName, lastName, email, password } = request.body;
-        const updatedAccount = await accountService.updateAccount(id, firstName, lastName, email, password, dependencies);
-        response.status(200).json(updatedAccount);
+        try {
+            // Input
+            const id = request.params.id;
+            const { firstName, lastName, email, password } = request.body;
+            const updatedAccount = await accountService.updateAccount(id, firstName, lastName, email, password, dependencies);
+            response.status(200).json(updatedAccount);
+        } catch (error) {
+            logger.error(new Error(error));
+        }
     };
     const authenticateAccount = async (request, response, next) => {
         try {
@@ -47,7 +64,7 @@ export default (dependencies) => {
         try {
             // Input
             const authHeader = request.headers.authorization;
-            console.log("contents of authHeader is - "+authHeader);
+            console.log("contents of authHeader is - " + authHeader);
             // Treatment
             const accessToken = authHeader.split(" ")[1];
             const user = await accountService.verifyToken(accessToken, dependencies);
@@ -72,6 +89,7 @@ export default (dependencies) => {
                 throw new Error('Movie already in Favourites list');
             }
         } catch (err) {
+            logger.error(new Error(`Invalid Data ${err.message}`));
             next(new Error(`Invalid Data ${err.message}`));
         }
     };
@@ -81,6 +99,7 @@ export default (dependencies) => {
             const favourites = await accountService.getFavourites(id, dependencies);
             response.status(200).json(favourites);
         } catch (err) {
+            logger.error(new Error(`Invalid Data ${err.message}`));
             next(new Error(`Invalid Data ${err.message}`));
         }
     };

@@ -1,0 +1,491 @@
+{
+	"info": {
+		"_postman_id": "a42f7191-0d97-4ce0-ac1d-3a038f18587d",
+		"name": "MSC WebDev API - Reviews",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "3789946"
+	},
+	"item": [
+		{
+			"name": "Account  - Create New Acc",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const jsonData = pm.response.json();\r",
+							"pm.collectionVariables.set('firstName', jsonData.firstName);\r",
+							"pm.collectionVariables.set('lastName', jsonData.lastName);\r",
+							"pm.collectionVariables.set('email', jsonData.email);\r",
+							"pm.collectionVariables.set('password', jsonData.password);\r",
+							"\r",
+							"pm.test(\"Account - Create New Acc - Status code is 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"pm.test(\"Account - Create New Acc - Authenticate Account Data\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData).to.have.property(\"email\");\r",
+							"    pm.expect(jsonData.password).to.be.not.null;\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.collectionVariables.set(\"firstName\", pm.variables.replaceIn('{{$randomFirstName}}'))\r",
+							"pm.collectionVariables.set(\"lastName\",pm.variables.replaceIn('{{$randomLastName}}'))\r",
+							"pm.collectionVariables.set(\"email\", pm.variables.replaceIn('{{$randomEmail}}'))\r",
+							"pm.collectionVariables.set(\"password\",\"Bean2023!\")\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"firstName\": \"{{firstName}}\",\r\n  \"lastName\": \"{{lastName}}\",\r\n  \"email\": \"{{email}}\",\r\n  \"password\": \"Bean2023!\"\r\n}\r\n\r\n\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "127.0.0.1:8080/api/accounts",
+					"host": [
+						"127.0.0.1"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"accounts"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Account - Authenticate Account Data",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const jsonData = pm.response.json();\r",
+							"pm.globals.set('BearerToken', jsonData.token.split(' ')[1]);\r",
+							"pm.test(\"Account - Authenticate Account Data - Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"pm.test(\"Account - Authenticate Account Data\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData).to.have.property(\"token\");\r",
+							"    pm.expect(jsonData.token).to.be.not.null;\r",
+							"    pm.expect(jsonData.token).contain(\"BEARER\");\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"firstName\": \"{{firstName}}\",\r\n  \"lastName\": \"{{lastName}}\",\r\n  \"email\": \"{{email}}\",\r\n  \"password\": \"Bean2023!\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "127.0.0.1:8080/api/accounts/security/token",
+					"host": [
+						"127.0.0.1"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"accounts",
+						"security",
+						"token"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Reviews - Add New",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.collectionVariables.set(\"movieId\", pm.variables.replaceIn('{{$randomInt}}'))\r",
+							"pm.collectionVariables.set(\"movie\", pm.variables.replaceIn('{{$randomFirstName}}'))\r",
+							"pm.collectionVariables.set(\"fullName\", pm.variables.replaceIn('{{$randomFullName}}'))\r",
+							"pm.collectionVariables.set(\"reviewText\", pm.variables.replaceIn('{{$randomCatchPhrase}} {{$randomPhrase}}'))\r",
+							"pm.collectionVariables.set(\"rating\", pm.variables.replaceIn('{{$randomInt}}'))\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const jsonData = pm.response.json();\r",
+							"pm.collectionVariables.set('reviewId', jsonData.id);\r",
+							"pm.collectionVariables.set('movieId', jsonData.movieId);\r",
+							"\r",
+							"pm.test(\"Reviews - Add New: Successful Response\",()=>pm.response.to.have.status(201))\r",
+							"\r",
+							"pm.test(\"Reviews - Add New: Response Object contains movie name\",()=>{\r",
+							"    pm.expect(jsonData).to.have.property(\"movie\");\r",
+							"    pm.expect(jsonData.movie).to.be.a(\"string\");\r",
+							"  })\r",
+							"\r",
+							"pm.test(\"Reviews - Add New: Response contains content\",()=>{\r",
+							"    pm.expect(jsonData).to.have.property(\"content\");\r",
+							"    pm.expect(jsonData.content).to.be.a(\"string\");\r",
+							"  })"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"movieId\": {{movieId}},\r\n    \"movie\": \"{{movie}}\",\r\n    \"author\": \"{{fullName}}\",\r\n    \"content\": \"{{reviewText}}\",\r\n    \"rating\": {{rating}}\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "127.0.0.1:8080/api/reviews",
+					"host": [
+						"127.0.0.1"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"reviews"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Reviews - Get All",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const jsonData = pm.response.json();\r",
+							"pm.test(\"Reviews - Get All: Successful Response\",()=>pm.response.to.have.status(200))\r",
+							"\r",
+							"pm.test(\"Reviews - Get All: Response Object contains movie name\",()=>{\r",
+							"    pm.expect(jsonData[0]).to.have.property(\"movie\");\r",
+							"    pm.expect(jsonData[0].movie).to.be.a(\"string\");\r",
+							"  })\r",
+							"\r",
+							"pm.test(\"Reviews - Get All: Response contains content\",()=>{\r",
+							"    pm.expect(jsonData[0]).to.have.property(\"content\");\r",
+							"    pm.expect(jsonData[0].content).to.be.a(\"string\");\r",
+							"  })"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{BearerToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"movieId\": 12345678,\r\n    \"movie\": \"Shaft\",\r\n    \"author\": \"Joe Bloggs\",\r\n    \"review\": \"this is a fairly good film\",\r\n    \"rating\": 2\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "127.0.0.1:8080/api/reviews",
+					"host": [
+						"127.0.0.1"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"reviews"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Reviews - Mongo ID - Get Specific Review",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const jsonData = pm.response.json();\r",
+							"pm.test(\"Reviews - Mongo ID - Get Specific Review: Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Reviews - Mongo ID - Get Specific Review: Review updated\",()=>{\r",
+							"    pm.expect(jsonData).to.have.property(\"content\");\r",
+							"    pm.expect(jsonData.content).to.be.a(\"string\");\r",
+							"    pm.expect(jsonData.id).to.eql(pm.collectionVariables.replaceIn(\"{{reviewId}}\"));\r",
+							"  })\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "127.0.0.1:8080/api/reviews/{{reviewId}}",
+					"host": [
+						"127.0.0.1"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"reviews",
+						"{{reviewId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Reviews - Movie ID - Get Specific Review",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const jsonData = pm.response.json();\r",
+							"pm.test(\"Reviews - Movie ID - Get Specific Review: Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Reviews - Movie ID - Get Specific Review: Review updated\",()=>{\r",
+							"    pm.expect(jsonData[0]).to.have.property(\"content\");\r",
+							"    pm.expect(jsonData[0].content).to.be.a(\"string\");\r",
+							"    pm.expect(jsonData[0].movieId).to.eql(pm.collectionVariables.get(\"movieId\"));\r",
+							"  })\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{BearerToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "127.0.0.1:8080/api/reviews/{{movieId}}/movie",
+					"host": [
+						"127.0.0.1"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"reviews",
+						"{{movieId}}",
+						"movie"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Reviews - Update Review",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const jsonData = pm.response.json();\r",
+							"pm.test(\"Reviews - Update Review: Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Reviews - Update review: Review updated\",()=>{\r",
+							"    pm.expect(jsonData).to.have.property(\"content\");\r",
+							"    pm.expect(jsonData.content).to.be.a(\"string\");\r",
+							"    pm.expect(jsonData.content).to.eql(\"This updated review, This updated review, This updated review\");\r",
+							"  })"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"movieId\": 1001,\r\n    \"movie\": \"It is updated\",\r\n    \"author\": \"Joe Roche\",\r\n    \"content\": \"This updated review, This updated review, This updated review\",\r\n    \"rating\": 101\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "127.0.0.1:8080/api/reviews/{{reviewId}}",
+					"host": [
+						"127.0.0.1"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"reviews",
+						"{{reviewId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Reviews - Delete Review",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Reviews - Delete Review: Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(204);\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"movieId\": 1001,\r\n    \"movie\": \"It is updated\",\r\n    \"author\": \"Joe Roche\",\r\n    \"content\": \"This updated review, This updated review, This updated review\",\r\n    \"rating\": 101\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "127.0.0.1:8080/api/reviews/{{reviewId}}/delete",
+					"host": [
+						"127.0.0.1"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"reviews",
+						"{{reviewId}}",
+						"delete"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "movieId",
+			"value": ""
+		},
+		{
+			"key": "movie",
+			"value": ""
+		},
+		{
+			"key": "fullName",
+			"value": ""
+		},
+		{
+			"key": "reviewText",
+			"value": ""
+		},
+		{
+			"key": "rating",
+			"value": ""
+		},
+		{
+			"key": "reviewId",
+			"value": ""
+		}
+	]
+}

@@ -44,7 +44,8 @@ export default class extends ReviewRepository {
 
     async remove(id) {
         try {
-            return this.model.findOneAndDelete(id);
+            logger.info("The Review with MongoDB ID - "+id+" has been deleted");
+            return this.model.findOneAndDelete(id);            
         } catch (error) {
             logger.error(new Error(error));
         }
