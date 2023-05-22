@@ -7,7 +7,7 @@ __Name:__ Joe Nunan\
 __Date:__ 20 May 2023
 
 ---------------------------------------------------------------------
-## Features.
+## Features
 ---------------------------------------------------------------------
 The following is a list of the features developed in the application as part of this assignment.
 
@@ -74,11 +74,11 @@ Additional installs were necessary in my React Movies App. These are described f
 ---------------------------------------------------------------------
 Before using the API, a number of configurations need to be made. The first area for configurations is in the .env file. This is not in the GIT repository and therefore needs to be added if spinning up locally. For the TMDB_KEY you must use your own TMDB API key. This can be obtained by going to https://www.themoviedb.org/ and signing up for a free account. For the JWT_SECRET_KEY you can select your own value. You need to keep both these values secure to ensure the security of your application.\
 <br/>
-The following is a screenshot of my .env file (with TMDB_KEY and JWT_SECRET_KEY replaced values replaced).
+The following is a screenshot of my .env file (with TMDB_KEY and JWT_SECRET_KEY values replaced).
 
 ![][image1]
 
-In the .env file, the DATABASE_URL value can be used to point the API to a different MongoDB (currently pointing to localhost version). The DATABASE_DIALECT shown above determines which dependencies are built for the API. You can see in the following screenshot what dependencies are built when the DATABASE_DIALECT is 'mongo'.
+In the .env file, the DATABASE_URL value can be used to point the API to a different MongoDB (originally pointing to localhost version but later setup MongoDB Atlas - see [Extra Features](#extra-features) section). The DATABASE_DIALECT shown above determines which dependencies are built for the API. You can see in the following screenshot what dependencies are built when the DATABASE_DIALECT is 'mongo'.
 
 ![][image2]
 
@@ -97,7 +97,7 @@ For the API design of my project I focused on three main functionaility endpoint
 + Actors - Endpoints for Actor Information
 + User Reviews of Actors - Endpoint for Actor Review Information
 
-These contain 10 endpoint URLs, utilising 15 various GET, POST, PUT and DELETE method invocations. In addition I utilised the accounts endpoint, built out as part of the labs, for authorisation and route protection in my React Application.
+These contain 10 endpoint URLs, utilising 15 various GET, POST, PUT and DELETE method invocations. In addition I utilised the Accounts endpoint, built out as part of the labs, for authorisation and route protection in my React Application.
 
 To better document the endpoints I developed for this assignment I used the Swagger API builder. 
 My Swagger API Documentation is available at the following link:
@@ -114,11 +114,11 @@ As I had intended trying to hook Swagger up with my API, I built out all the rel
 
 ![][image6]
 
-For the implementation of my new endpoints, I followed the same Clean Architecture approach as demonstrated in accounts endpoint. 
+For the implementation of my new endpoints, I followed the same Clean Architecture approach as demonstrated in setup of Accounts endpoint in the labs. 
 
 ![][image32]
 
-Following this approach made it very easy to create an API. I started with lowest level (entities & repositories), and then worked my way up through the layers (services, controller, routes, etc.). This systematic approach made life easier when laying out and coding the application. It also allows me to easily swap items such as databases downstream apis, etc. and provides a single point of entry for applications using the API.
+Following this approach made it very easy to create an API. I started with lowest level (entities & repositories), and then worked my way up through the layers (services, controller, routes, etc.). This systematic approach made life easier when laying out and coding the application. It also allows me to easily swap items such as databases, downstream apis, etc. while providing an API entry point that is totally abstracted from lower levels for applications using the API.
 <br/>
 <br/>
 
@@ -134,9 +134,9 @@ For security and authentication there are two elements that need to be examined:
 
 __Security and authentication for react Movie App__
 
-For the react application I already had authentication in place using SUPABASE user authentication. For this assignment I set up a stage environment which uses the API Accounts endpoint for authentication. Specific details of how this was implemented are included in the [Integrating with React App](#integrating-with-react-app) section of this report. 
+For the react application I already had authentication in place using SUPABASE user authentication. For this assignment I set up a stage environment which uses the API Accounts endpoint for authentication. Specific details of how this was implemented are included in the [Integrating with React App](#integrating-with-react-app) and [Extra Features](#extra-features) sections of this report. 
 
-After making these changes, protected routes, such as opening an actors details page were successfully protected - essentially my API authentication took the place of the SUPABASE authentication for the React Movie App protected routes. These protected routes are as follows...
+After making these changes, protected routes, such as opening an actors details page were successfully protected - proving my API authentication took the place of the SUPABASE authentication for the React Movie App protected routes. These protected routes are as follows...
 ~~~JavaScript
   <MoviesContextProvider>
     <Routes>
@@ -185,7 +185,7 @@ And then set the Authorization header in `contexts/authProvider` using the follo
   };
 ~~~
 
-I then utilised the authorization header in my fetch request as follows for protected route calls... 
+I then utilised the authorization header in my fetch request as follows for protected API route calls... 
 ~~~JavaScript
 export const getApiMovieReviews = (movieId) => {
     return fetch(
@@ -197,7 +197,7 @@ export const getApiMovieReviews = (movieId) => {
     ).then((res) => res.json());
 };
 ~~~
-The following screenshot from my Chrome DevTool shows the JWT Bearer_token in Local Storage
+The following screenshot from my Chrome DevTools shows the JWT Bearer_token in Local Storage
 
 ![][image20]
 
@@ -222,6 +222,7 @@ After I had created the validation schema, I added validation to all POST and PU
 
 ![][image8]
 
+I was able to verify this validation performed correctly by sending malformed requests using Postman.
 <br/>
 <br/>
 
@@ -274,7 +275,7 @@ The React application I created for Assignment 1, already had authentication usi
 
 I describe how this was setup under the [Independent Learning](#independent-learning) section of this README file.
 
-My React Movies App reporsitory is available at the following link. Please ensure to select the master branch of this repo when reviewing.
+My React Movies App repository is available at the following link. Please ensure to select the master branch of this repo when reviewing.
 
 + https://github.com/JGN1/labMoviesApp/tree/master
 
@@ -284,7 +285,7 @@ My React Movies App reporsitory is available at the following link. Please ensur
 <br/>
 
 ### __General changes for Integration__
-Firstly I added a new file to api folder - `ewd-api-jn-2023.js`. This file contains the endpoints of my API that the react app will interact with for authentication and review functionalities. I then needed to update the `vite.config.js` file to add proxy rules for the paths used by the API. The routes added can be seen below.
+Firstly I added a new file to ``src/api` folder - `ewd-api-jn-2023.js`. This file contains the endpoints of my API that the react app will interact with for authentication and review functionalities. I then needed to update the `vite.config.js` file to add proxy rules for the paths used by the API. The routes added can be seen below.
 
 ~~~JavaScript
 // https://vitejs.dev/config/
@@ -317,7 +318,7 @@ export default defineConfig({
 All changes to React code to integrate my API with my React application can be seen in the following Github commit comparison...
 + [React Movies App - Comparison of starting point commit and final commit](https://github.com/JGN1/labMoviesApp/compare/0a08d1befefea3da269d47d393ccfa5a13425a25...7494d2bb4abc8730022f496e13a6074b43fb7ccb)
 
-I created a `.env.stage` file to be used when running in stage environment. This file contains items such as my TMDB keys and a some new keys as can be seen below (TMDB and SUPABASE details redacted).
+I created a `.env.stage` file to be used when running in stage environment. This file contains items such as my TMDB keys and some new keys as can be seen below (TMDB and SUPABASE details redacted).
 
 ~~~JavaScript
 VITE_TMDB_KEY=...........
@@ -450,7 +451,7 @@ with...
 ~~~
 This is essentially performing a switch operation, calling the appropriate method based on the value of `VITE_AUTH_API` value in the .env (or .env.stage) file.
 
-The `components/profileIcon/index.jsx` page essentially manages the session of a logged in user. As such I needed to update this so that the React protected routes could be accessed/protected depending on whether user logged in or not. Additionally the information displayed in the profileIcon component changes for logged in and logged out users. The following screenshots illustrate this..
+The `components/profileIcon/index.jsx` page essentially manages the session of a logged in user. As such I needed to update this so that the React protected routes could be accessed/protected depending on whether user logged in or not. Additionally the information displayed in the profileIcon component changes for logged in and logged out users. The following screenshots illustrate this...
 
 ![][image13]
 ![][image14]
@@ -489,9 +490,6 @@ After...
   <MenuItem onClick={handleClose}>        
     <Avatar /> {displayName}
 ~~~
-
-[Security and Authentication](#security-and-authentication)
-
 After making these changes, protected routes, such as opening an actors details page became unavailable unless logged in - essentially my API authentication took the place of the SUPABASE authentication for the React Movie App protected routes. These protected routes are as follows...
 ~~~JavaScript
   <MoviesContextProvider>
@@ -625,41 +623,6 @@ For the first two situations, different links are displayed for the users conven
 + The first link is to the Login page 
 + The second link is to the Add Review page, and adds the movie object to the state so the user is brought to review form with correct images and movie details displayed...
 ![][image19]
-
-
-
-
-
-
-
-
-
-
-
-
-
-[Describe how you integrated your React app with the API. You can provide a link to the React App repo and give an example of an API call from React App. For example: ]
-
-
-
-
-
-
-
-~~~Javascript
-export const getMovies = () => {
-  return fetch(
-     '/api/movies',{headers: {
-       'Authorization': window.localStorage.getItem('token')
-    }
-  }
-  ).then((res) => res.json());
-};
-
-~~~
-
-[You can also add images of React app here also if you wish. This can be also shown in the video]
-
 <br/>
 <br/>
 
@@ -668,8 +631,8 @@ export const getMovies = () => {
 ---------------------------------------------------------------------
 __Logging and Error Handling__
 
-As an additional feature, I added error and application logging to my Express API application. This gave the dual benefit of being able to investigate and address issues in my code easily and provided error handling which prevents the application crashing. Having researched various options I decided on Winston logging for three main reasons:
-+ It appears as one of the more capable and popular loggers from my reasearch online
+As an additional feature, I added error and application logging to my Express API application. This gave the dual benefits of being able to investigate and address issues in my code easily and provided error handling which prevents the application crashing. Having researched various options I decided on Winston logging for three main reasons:
++ It appears as one of the more capable and popular loggers from my research online
 + It has 11.5 million weekly downloads
 + It facilitates multiple transports, i.e. it can send logs to databases, console, logs or other tools
 
@@ -830,13 +793,13 @@ Having the MongoDB hosted on cloud allows me to look at various Metrics relating
 ---------------------------------------------------------------------
 ## Independent learning.
 ---------------------------------------------------------------------
-As explained earlier in this report, I wanted to preserve teh original configuration of my React Movies Application, as it already included SUPABASE authentication. To get the assignment 2 API integrated with my application a significant amount of changes would be required. I decided the best way to acheive this was to set up two environments:
+As explained earlier in this report, I wanted to preserve the original configuration of my React Movies Application, as it already included SUPABASE authentication. To get the assignment 2 API integrated with my application a significant amount of changes would be required. I decided the best way to acheive this was to set up two environments:
 + dev - which would host and run my React Movie Application in its original form with SUPABASE integration
 + stage - which would hook directly to my API for authentication and other features.
 
 To achieve this I implemented two main aspects within the code:
-+ Use of if statement and environmental variables as 'switches' for local small changes
-+ Use of total rewrite of file on startup with content dependent on environment
++ Use of 'if' statements and environmental variables as 'switches' for local small changes
++ Use of total rewrite of authProvider context file on startup with content dependent on environment
 
 Within my React application I created a second .env file - `.env.stage`. Within this file I set variables specific to the particular environment. The following show the variables that differed between environments
 
@@ -866,9 +829,9 @@ Once the environmental files were set up for each environment I was able to use 
 ~~~
 When it came to making changes to the main context file for authentication - `contexts/authProvider` it would have been too cluttered to include code for both environments in a single file. To get around this I decided to make two separate authProvider files
 + `contexts/authProvider_SUPABASE` - containing code for dev environment 
-+ `contexts/authProvider_API` - containing code for dev environment 
++ `contexts/authProvider_API` - containing code for stage environment 
 
-I then created a file called setupAuthContextFile.js with the following code with `process.argv[2]` referring to filename passed in with node command in `package.json`...
+I then created a file called setupAuthContextFile.js with the following code...
 ~~~JavaScript
 const fs = require('fs');
 require('dotenv').config();
@@ -887,7 +850,7 @@ fs.copyFile(sourceFile, destinationFile, (err) => {
   }
 });
 ~~~
-To execute this code on startup before my API starts, I added a `dev` and `stage` script in `package.json` as follows...
+In the above code, with `process.argv[2]` refers to filename passed in with `node` command in `package.json`. To execute this code on startup before my API starts, I added a `dev` and `stage` script in `package.json` as follows...
 ~~~JavaScript
 "scripts": {
   "storybook": "cross-env NODE_OPTIONS=--openssl-legacy-provider start-storybook -p 6006 -s public",
@@ -907,11 +870,12 @@ or..
 npm run stage
 ~~~
 
-Finally, in order to be able to easily identify which environment the Movies App was running in I added the environment to the siteheader banner. This involved followign changes to `src/components/siteHeader/index.jsx`...
+Finally, in order to be able to easily identify which environment the Movies App was running in, I added the environment to the siteheader banner. This involved the following changes to `src/components/siteHeader/index.jsx`...
 ~~~JavaScript
 const environment = import.meta.env.VITE_NODE_ENV;
 
 // ..Code as Before...
+
  <AppBar sx={styles.appbar} position="fixed" elevation={0} color="primary">
         <Toolbar>
           <Typography variant="h4" sx={styles.title}>
@@ -928,6 +892,7 @@ To implement the environments in my react movie app I installed following additi
     "env-cmd": "^10.1.0",
     "fs": "^0.0.1-security",
 ~~~
+Implementing above, and indeed a significant amount of the functionality in this application necessitated a lot of research of VITE, NodeJS, Winston, MongoDB, Vercel and other documentation. Whilst this project took a lot of hours to complete, it has been  both a beneficial and enjoyable experience. Kudos to the lecturers for a course well thought out and delivered - Thanks!
 
 [image1]: readme_images/01_API_.env_contents.png
 [image2]: readme_images/02_API_dependencies.js.png
