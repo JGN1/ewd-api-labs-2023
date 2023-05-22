@@ -19,17 +19,12 @@ The following is a list of the features developed in the application as part of 
  + Added new features to React app to interact with API
  + Hooked movie review screen to Review endpoint to allow adding reviews
  + Altered 'Review' drawer in Movie details page to retrieve and display reviews with API
- + Altered 'Review' drawer in Movie details page to display different items dependign on whether user logged in (accounts API) and whether review existed or not 
+ + Altered 'Review' drawer in Movie details page to display different items depending on whether user logged in (accounts API) and whether review existed or not 
  + Integrated authentication for React with Accounts endpoint of the API
  + Built out Postman tests for new endpoints and added to Newman
  + Set up Swagger API documentation
-
- 
- + add more, add more, add more
-
-   e.g.
-
- + Get Similar Movies:  Get a list of similar movies using a movie ID. 
+ + Set up deployment of API to Vercel with each Github commit
+ + Setup MongoDB Atlas cloud hosted DB and connected to API codespace
 <br/>
 <br/>
 
@@ -118,6 +113,12 @@ The following screenshots show the API endpoints in Swagger along with a brief d
 As I had intended trying to hook Swagger up with my API, I built out all the relevant schemas for both requests and responses. These are detailed in this screenschot.
 
 ![][image6]
+
+For the implementation of my new endpoints, I followed the same Clean Architecture approach as demonstrated in accounts endpoint. 
+
+![][image32]
+
+Following this approach made it very easy to create an API. I started with lowest level (entities & repositories), and then worked my way up through the layers (services, controller, routes, etc.). This systematic approach made life easier when laying out and coding the application. It also allows me to easily swap items such as databases downstream apis, etc. and provides a single point of entry for applications using the API.
 <br/>
 <br/>
 
@@ -788,14 +789,21 @@ This is much better than the application crashing and not being aware of the rea
 
 __Vercel Deployment__
 
-I setup my API to deploy to Vercel each time I commit code to Github. 
+I setup my API to deploy to Vercel each time I commit code to Github. My intention had been to hook up my Vercel Deployment with my MongoDB Atlas deployment but unfortunately I ran out of time to finish this. The following screenshot shows details of my API deployment on Vercel...
 
+![][image29]
 
+And the following screenshot shows a deployment in progress...
 
+![][image30]
 
+The exposed Domain URL for the deployment is [https://ewd-api-labs-2023.vercel.app/](https://ewd-api-labs-2023.vercel.app/)
+<br/>
+<br/>
 
 __MongoDB Atlas (Cloud)__
-After completing the application I setup a cloud hosted version of my MongoDB using MongoDB Atlas. To do this I had to carry out a number of steps. Firstly I signed up for a free account on [https://www.mongodb.com/cloud](https://www.mongodb.com/cloud). Once set up I set up a free 'M0' cluster. Once I had that setup I had to go to Network Access to whitelist the IP addresses that traffic would be accepted from.  
+
+After completing the application I setup a cloud hosted version of my MongoDB using MongoDB Atlas. To do this I had to carry out a number of steps. Firstly I signed up for a free account on [https://www.mongodb.com/cloud](https://www.mongodb.com/cloud). Once signed up, I set up a free 'M0' cluster. Then I had to go to Network Access to whitelist the IP addresses that traffic would be accepted from.  
 
 Next I choose connect to cluster option from where I could copy the connection string...
 
@@ -807,7 +815,7 @@ To get my Codespace connected to the cloud hosted MongoDB, I had to add a Codesp
 
 ![][image26]
 
-Since I now had the DATABASE_URL set in the Codespace secrets, I was able to remove this value from the .env file.  
+To make these changes take effect I had to rebuild my codespace/container. Since I now had the DATABASE_URL set in the Codespace secrets, I was able to remove this value from the .env file.  
 
 After setting up the database, I used both my Postman and Newman tests to try uploading data to the database. In addition, I spun up the React Movie App and added a movie review through the application. The following screenshot from MongoDB Compass shows the tables created in movies1_db, including the review I added through the Movies App...
 
@@ -816,44 +824,110 @@ After setting up the database, I used both my Postman and Newman tests to try up
 Having the MongoDB hosted on cloud allows me to look at various Metrics relating to its use. The following screenshot shows a selection of these metrics...
 
 ![][image28]
-
-
-
-I had intended doing more with this, including setting my MongoDB up on 
-
-((add screenshot here then explain how deployed but did not have time to setup MOngoDB in cloud and complete configurations to be able to use cloud api instead of localhost))
-
-
-. . Briefly explain any non-standard features, functional or non-functional, developed for the app.  
-
-If you deployed to a hosting service/cloud, you should specify here. 
-
-
-WINSTON LOgging - 5 file rotation - app and error
-Try/Catch on items feeding out to Logger
-
-Try/Catch on items feeding out to Logger
-
-
-Have API code code deploying to Vercel, don't have MongoDB setup on hosted services
 <br/>
 <br/>
 
 ---------------------------------------------------------------------
 ## Independent learning.
 ---------------------------------------------------------------------
+As explained earlier in this report, I wanted to preserve teh original configuration of my React Movies Application, as it already included SUPABASE authentication. To get the assignment 2 API integrated with my application a significant amount of changes would be required. I decided the best way to acheive this was to set up two environments:
++ dev - which would host and run my React Movie Application in its original form with SUPABASE integration
++ stage - which would hook directly to my API for authentication and other features.
 
-+ ++ file copy, environments for REACT STAGE DEV, import.meta.env.____
-expalin how installed dotenv and other package for this
+To achieve this I implemented two main aspects within the code:
++ Use of if statement and environmental variables as 'switches' for local small changes
++ Use of total rewrite of file on startup with content dependent on environment
 
-. . State the non-standard aspects of React/Express/Node (or other related technologies) that you researched and applied in this assignment . .  
-<br/>
-<br/>
+Within my React application I created a second .env file - `.env.stage`. Within this file I set variables specific to the particular environment. The following show the variables that differed between environments
 
-ADDED TRY/CATCH to Accounts endpoint also to prevent app crashing on error
+~~~JavaScript
+VITE_NODE_ENV=development
+VITE_AUTH_API=SUPABASE
+VITE_AUTHPROVIDER_PATH=./src/contexts/authProvider_SUPABASE.jsx
+REACT_APP_NOTES=forAUTH_API_options_are_SUPABASE_or_MONGODB
+~~~
 
-### Carry out final review of github comparison, ZZZ_General Notes and desktop text file with notes to ensure have everything included
+~~~JavaScript
+VITE_NODE_ENV=stage
+VITE_AUTH_API=MONGODB
+VITE_AUTHPROVIDER_PATH=./src/contexts/authProvider_API.jsx
+REACT_APP_NOTES=for_AUTH_API_options_are_SUPABASE_or_MONGODB
+~~~
 
+Once the environmental files were set up for each environment I was able to use if statements similar to the following to switch between setups, `SUPABASE` being my dev environment and `MONBGODB` being my stage.
+
+~~~JavaScript
+  if (import.meta.env.VITE_AUTH_API == "SUPABASE") {
+    // Code to be performed if Dev environment
+  }
+  if (import.meta.env.VITE_AUTH_API == "MONGODB") {
+    // Code to be performed if Stage environment
+  }
+~~~
+When it came to making changes to the main context file for authentication - `contexts/authProvider` it would have been too cluttered to include code for both environments in a single file. To get around this I decided to make two separate authProvider files
++ `contexts/authProvider_SUPABASE` - containing code for dev environment 
++ `contexts/authProvider_API` - containing code for dev environment 
+
+I then created a file called setupAuthContextFile.js with the following code with `process.argv[2]` referring to filename passed in with node command in `package.json`...
+~~~JavaScript
+const fs = require('fs');
+require('dotenv').config();
+
+const fileName = process.argv[2];
+console.log("Source File Used - "+ fileName);
+const sourceFile = './src/contexts/'+fileName+'.jsx';
+const destinationFile = './src/contexts/authProvider.jsx';
+
+fs.copyFile(sourceFile, destinationFile, (err) => {
+  if (err) {
+    console.error('An error occurred while copying the file:', err);
+    // setTimeout(5000);
+  } else {
+    console.log('File copied and renamed successfully!');
+  }
+});
+~~~
+To execute this code on startup before my API starts, I added a `dev` and `stage` script in `package.json` as follows...
+~~~JavaScript
+"scripts": {
+  "storybook": "cross-env NODE_OPTIONS=--openssl-legacy-provider start-storybook -p 6006 -s public",
+  "build-storybook": "build-storybook",
+  "dev": "node setupAuthContextFile.js authProvider_SUPABASE && vite",
+  "stage": "node setupAuthContextFile.js authProvider_API && vite --mode stage",
+  "build": "vite build",
+  "preview": "vite preview"
+},
+~~~
+Now I can start the app in either environment by using 
+~~~JavaScript
+npm run dev
+~~~
+or..
+~~~JavaScript
+npm run stage
+~~~
+
+Finally, in order to be able to easily identify which environment the Movies App was running in I added the environment to the siteheader banner. This involved followign changes to `src/components/siteHeader/index.jsx`...
+~~~JavaScript
+const environment = import.meta.env.VITE_NODE_ENV;
+
+// ..Code as Before...
+ <AppBar sx={styles.appbar} position="fixed" elevation={0} color="primary">
+        <Toolbar>
+          <Typography variant="h4" sx={styles.title}>
+            TMDB Client ({environment})
+          </Typography>
+~~~
+The result of this can be seen in the screenshot below... 
+
+![][image31]
+
+To implement the environments in my react movie app I installed following additional packages to allow interaction with the environmental variables and the copy/rewrite of files.
+~~~JavaScript
+    "dotenv": "^16.0.3",
+    "env-cmd": "^10.1.0",
+    "fs": "^0.0.1-security",
+~~~
 
 [image1]: readme_images/01_API_.env_contents.png
 [image2]: readme_images/02_API_dependencies.js.png
@@ -883,5 +957,9 @@ ADDED TRY/CATCH to Accounts endpoint also to prevent app crashing on error
 [image26]: readme_images/26_MongoAtlas_Codespace_Secret.png
 [image27]: readme_images/27_MongoAtlas_DB_Content.png
 [image28]: readme_images/28_MongoAtlas_DB_Traffic.png
+[image29]: readme_images/29_Vercel_Deployment_details.png
+[image30]: readme_images/30_Vercel_Deployment_In_Progress.png
+[image31]: readme_images/31_SiteHeader_Change.png
+[image32]: readme_images/32_Clean_Arch_Layout.png
 
 
