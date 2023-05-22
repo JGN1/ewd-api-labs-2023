@@ -124,9 +124,6 @@ As I had intended trying to hook Swagger up with my API, I built out all the rel
 ---------------------------------------------------------------------
 ## Security and Authentication
 ---------------------------------------------------------------------
-[Give details of authentication/ security implemented on the API(e.g. passport/sessions). Indicate which routes are protected. **REMEMBER: DON'T PUT YOUR OWN USERNAMES/PASSWORDS/AUTH KEYS IN THE README OR ON GITHUB]**
-
-[Give details of the routes that have authentication. ]
 
 For security and authentication there are two elements that need to be examined:
 + Security and authentication for react Movie App
@@ -138,7 +135,7 @@ __Security and authentication for react Movie App__
 
 For the react application I already had authentication in place using SUPABASE user authentication. For this assignment I set up a stage environment which uses the API Accounts endpoint for authentication. Specific details of how this was implemented are included in the [Integrating with React App](#integrating-with-react-app) section of this report. 
 
-After making these changes, protected routes, such as opening an actors details page became unavailable unless logged in - essentially my API authentication took the place of the SUPABASE authentication for the React Movie App protected routes. These protected routes are as follows...
+After making these changes, protected routes, such as opening an actors details page were successfully protected - essentially my API authentication took the place of the SUPABASE authentication for the React Movie App protected routes. These protected routes are as follows...
 ~~~JavaScript
   <MoviesContextProvider>
     <Routes>
@@ -156,7 +153,7 @@ After making these changes, protected routes, such as opening an actors details 
 
 __Security and authentication for API__
 
-For the API security and authentication, I sent request to my API to authenticate the user using the following function in `ewd-api-jn-2023`...
+For the API security and authentication, I sent a request to my API to authenticate the user using the following function in `ewd-api-jn-2023`...
 ~~~JavaScript
   export const login = (email, password) => {
     return fetch('/api/accounts/security/token', {
@@ -203,9 +200,9 @@ The following screenshot from my Chrome DevTool shows the JWT Bearer_token in Lo
 
 ![][image20]
 
-This bearer token is passed to my API via the Authorization Header and used to verify the user is authorised to make teh call they are attempting to invoke.
+This bearer token is passed to my API via the Authorization Header and used to verify the user is authorised to make the call they are attempting to invoke.
 
-I have built out logic in the react review drawer to illustrate changing information displayed based on whether individual logged in or not. 
+I have built out logic in the react review drawer to illustrate changing the information displayed based on whether individual logged in or not. 
 
 This can be seen under the [Integrating with React App](#integrating-with-react-app) section of this report. 
 <br/>
@@ -214,18 +211,15 @@ This can be seen under the [Integrating with React App](#integrating-with-react-
 ---------------------------------------------------------------------
 ## Validation
 ---------------------------------------------------------------------
-I added validation using JOI for both the reviews and actor reviews. The actors endpoint did not need as I am only performing GET operations.\
+I added validation using JOI for both the reviews and actor reviews. The actors endpoint did not need this as I am only performing GET operations.\
 <br/>
-For this I created two validator schemas - actors/validators/index.js and reviews/validators/index.js
+For this I created two validator schemas - `actors/validators/index.js` and `reviews/validators/index.js`
 
 ![][image7]
 
 After I had created the validation schema, I added validation to all POST and PUT routes. This can be seen in the screenshot below which shows routes for both actors and reviews.
 
 ![][image8]
-
-
-[Briefly describe and extra data validation you added to the API, and where it is implemented in the App.]
 
 <br/>
 <br/>
@@ -264,20 +258,27 @@ In total there are 19 tests with 47 assertions. The full regression test takes a
 ---------------------------------------------------------------------
 
 For this assignment, I integrated my API with my React Movies App in the following areas:
-+ Authentication
++ Authentication using Accounts Endpoint
   - For login to the application so users can access protected routes within the React Movie application
   - For authentication of API calls to protected endpoint URLs using JWT Bearer Token
-+ Movie Reviews
++ Movie Reviews using Reviews Endpoint
   - Allow a user to submit a review, which is subsequently stored in MongoDB table
-  - Retrieve a users review for a particular movie from MongoDB and display in the application
+  - Retrieve a user's review for a particular movie from MongoDB and display in the application
   - If user is not logged in, inform them in Review drawer and provide link to login
-  - If user is logged in but no user reviews for movie in question exist, provide link to review form, passing movie information in state so Review form page displays correct movie images
+  - If user is logged in but no user reviews for movie in question exist, provide link to review form, passing movie information in state so Review form page displays correct movie images and details
 
 The React application I created for Assignment 1, already had authentication using Supabase, and is deployed to Vercel. As such I wanted to preserve the application with this configuration. To achieve this I set up two environments for my React Movie Application:
 + Dev environment - configured as per original Assignment 1 setup with Supabase authentication.
 + Stage environment - integrated with my Assignment 2 API for authentication, reviews, etc.
 
 I describe how this was setup under the [Independent Learning](#independent-learning) section of this README file.
+
+My React Movies App reporsitory is available at the following link. Please ensure to select the master branch of this repo when reviewing.
+
++ https://github.com/JGN1/labMoviesApp/tree/master
+
+
+
 <br/>
 <br/>
 
@@ -312,7 +313,7 @@ export default defineConfig({
 })
 ~~~
 
-All changes to React code to integrate my API with my React application can be seen in the following GIthub commit comparison...
+All changes to React code to integrate my API with my React application can be seen in the following Github commit comparison...
 + [React Movies App - Comparison of starting point commit and final commit](https://github.com/JGN1/labMoviesApp/compare/0a08d1befefea3da269d47d393ccfa5a13425a25...7494d2bb4abc8730022f496e13a6074b43fb7ccb)
 
 I created a `.env.stage` file to be used when running in stage environment. This file contains items such as my TMDB keys and a some new keys as can be seen below (TMDB and SUPABASE details redacted).
@@ -328,12 +329,12 @@ VITE_AUTHPROVIDER_PATH=./src/contexts/authProvider_API.jsx
 REACT_APP_NOTES=for_AUTH_API_options_are_SUPABASE_or_MONGODB
 ~~~
 
-The `VITE_NODE_ENV` and `VITE_AUTH_API` environmental variables are used as effectively switches between dev and stage in code. This is described in more detail in [Independent Learning](#independent-learning) section of this README file.
+The `VITE_NODE_ENV` and `VITE_AUTH_API` environmental variables are effectively used as switches between dev and stage in the code. This is described in more detail both further down in this section and in the [Independent Learning](#independent-learning) section of this README file.
 <br/>
 <br/>
 
 ### __Integration for Authentication__
-I wanted to minimise changes to get my React application to interact with my API for authentication . To achieve this I used a combination of total rewrite/replacement of `contexts\authProvider.jsx` file, followed by alterations to two other files - `login.jsx` and `profileIcon/index.jsx`. 
+I wanted to minimise the changes required to get my React application to interact with my API for authentication . To achieve this I used a combination of total rewrite/replacement of `contexts\authProvider.jsx` file, followed by alterations to two other files - `login.jsx` and `profileIcon/index.jsx`. 
 
 Having code for both SUPABASE and my API in the one file would have been too cluttered, so I opted to rewrite the content of the `contexts\authProvider.jsx` file on startup, with the content depending on the environment choosen. The `authProvider` file used for my API is similar to that used for the react app in the labs with some minor alterations to fit in with my React code.
 
@@ -430,7 +431,6 @@ This allowed me to use methods from either SUPABASE or API authProvider context.
 with... 
 ~~~JavaScript
       if (import.meta.env.VITE_AUTH_API == "SUPABASE") {
-        console.log("in login.jsx - 1 - SUPABASE");
         const {
           data: { user, session },
           error
@@ -439,7 +439,6 @@ with...
         if (user) navigate("/");
       }
       if (import.meta.env.VITE_AUTH_API == "MONGODB") {
-        console.log("in login.jsx - 1 - MONGODB");
         const {
           data: { user, session },
           error
@@ -464,16 +463,14 @@ with...
 ~~~JavaScript
 await signout();
 ~~~
-to cover differences in method naming depending on whether SUPABSE or API. Also `const { error }` throws errors when app pointed to API. I also refactored the name of the `signOut()` method in the SUPABASE authProvider context file to `signout()`. 
+This was to cover differences in method naming depending on whether SUPABASE or API. Also `const { error }` throws errors when app pointed to API. I also refactored the name of the `signOut()` method in the SUPABASE authProvider context file to `signout()`. 
 
 The second section of code changed was as follows...
 ~~~JavaScript
   if (import.meta.env.VITE_AUTH_API == "SUPABASE") {
-    // setName = props.user;
     var displayName = props.user;
   }
   if (import.meta.env.VITE_AUTH_API == "MONGODB") {
-    // setName = user;
     var displayName = user;
   }
 ~~~
@@ -530,7 +527,7 @@ The following changes were made to the `contexts/moviesContext.jsx` file. Firstl
 ~~~JavaScript
   import {apiAddReview} from "../api/ewd-api-jn-2023";
 ~~~
-Then in the addReview function of the script I added call to teh apiAddReview endpoint.
+Then in the addReview function of the script I added call to the apiAddReview endpoint.
 ~~~JavaScript
   const addReview = (movie, review) => {   
     apiAddReview(movie.id, movie.original_title, review.author, review.review, review.rating);
@@ -539,7 +536,7 @@ Then in the addReview function of the script I added call to teh apiAddReview en
 ~~~
 These changes pointed the MovieContext to my API so I was then able to make the other required changes.
 
-In `components/movieReviews/index.jsx`, built in quite a bit of logic to deal with the three possible states...
+In `components/movieReviews/index.jsx`, I built in quite a bit of logic to deal with the three possible states...
 + State where user not logged in
 + State where user logged in but no reviews
 + State where user logged in and reviews exist
@@ -556,7 +553,7 @@ I then added various useState constants that I would utilise later in the file..
   const [responseLinkText, setResponseLinkText] = useState();
   const [responseState, setResponseState] = useState();
 ~~~
-I then needed to add 'switch' to the `useEffect()` section of the script. For SUPABASE (dev environment) I added teh following...
+I then needed to add 'switch' to the `useEffect()` section of the script. For SUPABASE (dev environment) I added the following...
 ~~~JavaScript
  if (import.meta.env.VITE_AUTH_API == "SUPABASE") {
       getMovieReviews(movie.id).then((rev) => {
@@ -624,7 +621,7 @@ Review drawer display where user logged in and reviews exist...
 ![][image18]
 
 For the first two situations, different links are displayed for the users convenience.
-+ The first link to Login page 
++ The first link is to the Login page 
 + The second link is to the Add Review page, and adds the movie object to the state so the user is brought to review form with correct images and movie details displayed...
 ![][image19]
 
@@ -668,6 +665,164 @@ export const getMovies = () => {
 ---------------------------------------------------------------------
 ## Extra features
 ---------------------------------------------------------------------
+__Logging and Error Handling__
+
+As an additional feature, I added error and application logging to my Express API application. This gave the dual benefit of being able to investigate and address issues in my code easily and provided error handling which prevents the application crashing. Having researched various options I decided on Winston logging for three main reasons:
++ It appears as one of the more capable and popular loggers from my reasearch online
++ It has 11.5 million weekly downloads
++ It facilitates multiple transports, i.e. it can send logs to databases, console, logs or other tools
+
+Implementing Winston Logger was relatively straightforward. I firstly installed the winston package from NPM.
+```cmd
+npm install --save winston
+```
+I then created a folder and file called `src/logger/index.js` with the following content. This was an adaptation of the quickstart code provided on the [wintonjs github](https://github.com/winstonjs/winston/blob/master/examples/quick-start.js)
+~~~JavaScript
+const { createLogger, format, transports } = require('winston');
+
+const logger = createLogger({
+    level: 'info',
+    format: format.combine(
+        format.timestamp({
+            format: 'YYYY-MM-DD HH:mm:ss'
+        }),
+        format.errors({ stack: true }),
+        format.splat(),
+        format.json()
+    ),
+    defaultMeta: { service: 'EWD-API-2023-JNunan' },
+    transports: [
+        new transports.File({ filename: 'logs/error.log', level: 'error', maxsize: '50000', maxFiles: '5', tailable: true }),
+        new transports.File({ filename: 'logs/application.log', maxsize: '50000', maxFiles: '5', tailable: true })
+    ]
+});
+
+//
+// If we're not in production then **ALSO** log to the `console`
+// with the colorized simple format.
+//
+if (process.env.NODE_ENV !== 'production') {
+    logger.add(new transports.Console({
+        format: format.combine(
+            format.colorize(),
+            format.simple()
+        )
+    }));
+}
+
+export default logger;
+~~~
+
+I outputted the log files to `src/logs` and choose to output both application and error logs. I know from experience at work that log files can quickly become too large and take up significant amounts of space. I wanted to avoid this situation for my own logging so I researched options for setting log file size and log file rotation. The solution was to use the `winston-daily-rotate-file` package. I installed using the following call.
+```cmd
+npm install --save winston
+```
+After examining the documentation I choose the following configuration options for my log files...
+~~~JavaScript
+maxsize: '50000', maxFiles: '5', tailable: true
+~~~
+These options work as follows:
++ maxsize - maximum size of file in bytes (winston-daily-rotate-file option)
++ maxFiles - maximum number of files created and used in the rotation process (winston-daily-rotate-file option)
++ tailable - log files will be rolled based on maxsize and maxfiles, but in ascending order. The filename will always have the most recent log lines. (winston option under File Transport)
+
+The following screenshot shows the logs folder in my project, along with application and error logs...
+
+![][image21]
+
+And here we see sample screenshot from inside one of the error log files...
+
+![][image22]
+
+After setting this up, I then proceeded to add try/catches to my code at three specific levels:
++ repositories
++ services
++ controllers
+
+The following is an example of this in my controller for the reviews endpoint...
+~~~JavaScript
+    const getReview = async (request, response, next) => {
+        try {
+            //input
+            const reviewId = request.params.id;
+            // Treatment
+            const review = await reviewService.getReview(reviewId, dependencies);
+            //output
+            response.status(200).json(review);
+        } catch (error) {
+            response.status(400).json(error);
+            logger.error(new Error(error));
+        }
+    };
+~~~
+In some cases I also added `info` level logging where I wanted to see specific information in the application log files. For example...
+~~~JavaScript
+    const getReviewByMovieId = async (request, response, next) => {
+        try {
+            //input
+            const movieId = request.params.id;
+            // Treatment
+            const review = await reviewService.getReviewByMovieId(movieId, dependencies);
+            //output
+            response.status(200).json(review);
+            logger.info(JSON.stringify(review));
+        } catch (error) {
+            response.status(400).json(error);
+            logger.error(new Error(error));
+        }
+    };
+~~~
+
+Implementing this logging and adding try/catches to my code, also helped resolve issues with my API application crashing when it received incorrect information or duplicates. An example of this relates to adding a user using the Accounts endpoint. When this was initially setup, my application would crash if I accidentally tried to add the same user twice. After implementing logging and error handling, I instead had error message generated that I could address and the application stayed running...
+
+![][image23]
+
+You can see from the above that an error was generated because the user already exists.
+~~~JavaScript
+error: MongoServerError: E11000 duplicate key error collection: movies_db.accounts index: email_1 dup key: { email: "mick.dunne@ormail.com" }
+~~~
+
+This is much better than the application crashing and not being aware of the reason for it.
+<br/>
+<br/>
+
+__Vercel Deployment__
+
+I setup my API to deploy to Vercel each time I commit code to Github. 
+
+
+
+
+
+__MongoDB Atlas (Cloud)__
+After completing the application I setup a cloud hosted version of my MongoDB using MongoDB Atlas. To do this I had to carry out a number of steps. Firstly I signed up for a free account on [https://www.mongodb.com/cloud](https://www.mongodb.com/cloud). Once set up I set up a free 'M0' cluster. Once I had that setup I had to go to Network Access to whitelist the IP addresses that traffic would be accepted from.  
+
+Next I choose connect to cluster option from where I could copy the connection string...
+
+![][image25]
+
+I also downloaded the MongoDB Compass application so I could easily look at the MongoDB contents.
+
+To get my Codespace connected to the cloud hosted MongoDB, I had to add a Codespace secret to my repository, which consisted of the connection string with my password built into it...
+
+![][image26]
+
+Since I now had the DATABASE_URL set in the Codespace secrets, I was able to remove this value from the .env file.  
+
+After setting up the database, I used both my Postman and Newman tests to try uploading data to the database. In addition, I spun up the React Movie App and added a movie review through the application. The following screenshot from MongoDB Compass shows the tables created in movies1_db, including the review I added through the Movies App...
+
+![][image27]
+
+Having the MongoDB hosted on cloud allows me to look at various Metrics relating to its use. The following screenshot shows a selection of these metrics...
+
+![][image28]
+
+
+
+I had intended doing more with this, including setting my MongoDB up on 
+
+((add screenshot here then explain how deployed but did not have time to setup MOngoDB in cloud and complete configurations to be able to use cloud api instead of localhost))
+
 
 . . Briefly explain any non-standard features, functional or non-functional, developed for the app.  
 
@@ -678,6 +833,9 @@ WINSTON LOgging - 5 file rotation - app and error
 Try/Catch on items feeding out to Logger
 
 Try/Catch on items feeding out to Logger
+
+
+Have API code code deploying to Vercel, don't have MongoDB setup on hosted services
 <br/>
 <br/>
 
@@ -686,12 +844,15 @@ Try/Catch on items feeding out to Logger
 ---------------------------------------------------------------------
 
 + ++ file copy, environments for REACT STAGE DEV, import.meta.env.____
+expalin how installed dotenv and other package for this
 
 . . State the non-standard aspects of React/Express/Node (or other related technologies) that you researched and applied in this assignment . .  
 <br/>
 <br/>
 
 ADDED TRY/CATCH to Accounts endpoint also to prevent app crashing on error
+
+### Carry out final review of github comparison, ZZZ_General Notes and desktop text file with notes to ensure have everything included
 
 
 [image1]: readme_images/01_API_.env_contents.png
@@ -714,4 +875,13 @@ ADDED TRY/CATCH to Accounts endpoint also to prevent app crashing on error
 [image18]: readme_images/18_Review_Drawer_Logged_In_Reviews.png
 [image19]: readme_images/19_Review_Form_With_Movie_State.png
 [image20]: readme_images/20_Bearer_Token_in_DevTools.png
+[image21]: readme_images/21_Log_File_Folder.png
+[image22]: readme_images/22_Sample_Error_Logfile.png
+[image23]: readme_images/23_Console_Error_Duplicate_User_Accounts.png
+[image24]: readme_images/24_Vercel_Deployment.png
+[image25]: readme_images/25_MongoAtlas_Connect.png
+[image26]: readme_images/26_MongoAtlas_Codespace_Secret.png
+[image27]: readme_images/27_MongoAtlas_DB_Content.png
+[image28]: readme_images/28_MongoAtlas_DB_Traffic.png
+
 
